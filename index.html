@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Playcode Data Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables - Google Theme */
+        :root {
+            --google-blue: #4285F4;
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+            --google-dark: #202124;
+            --google-dark-light: #3C4043;
+            --google-light: #FFFFFF;
+            --google-gray-light: #F8F9FA;
+            --google-gray: #E8EAED;
+            --google-text: #202124;
+            --google-text-light: #5F6368;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8f0fe 100%);
+            color: var(--google-text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .google-colors {
+            background: linear-gradient(90deg, 
+                var(--google-blue) 0%, 
+                var(--google-blue) 25%, 
+                var(--google-red) 25%, 
+                var(--google-red) 50%, 
+                var(--google-yellow) 50%, 
+                var(--google-yellow) 75%, 
+                var(--google-green) 75%, 
+                var(--google-green) 100%
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--google-text-light);
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Card Styles - Google Material Design */
+        .card {
+            background: var(--google-light);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--google-gray);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--google-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--google-blue);
+        }
+
+        /* Form Elements - Google Style */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--google-text);
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--google-gray);
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            font-family: 'Google Sans', sans-serif;
+            transition: var(--transition);
+            background: var(--google-light);
+            color: var(--google-text);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--google-blue);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Button Styles - Google Material */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--google-blue);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--google-blue);
+            border: 1px solid var(--google-gray);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(66, 133, 244, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--google-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2e8b57;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--google-red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d33426;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: var(--google-yellow);
+            color: var(--google-dark);
+        }
+
+        .btn-warning:hover {
+            background: #f9ab00;
+            transform: translateY(-2px);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #8B5CF6, #6366F1);
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background: linear-gradient(135deg, #7C3AED, #4F46E5);
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-file input[type="file"] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+
+        /* Tab Styles */
+        .tabs-container {
+            margin: 24px 0;
+            border-bottom: 2px solid var(--google-gray);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .tab {
+            padding: 14px 24px;
+            background: transparent;
+            border: none;
+            color: var(--google-text-light);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            background: rgba(66, 133, 244, 0.05);
+            color: var(--google-blue);
+        }
+
+        .tab.active {
+            color: var(--google-blue);
+            background: white;
+            border-bottom: 3px solid var(--google-blue);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* User Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--google-gray);
+            transition: var(--transition);
+            border-left: 4px solid var(--google-blue);
+        }
+
+        .info-card:hover {
+            border-color: var(--google-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--google-text-light);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-value {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--google-dark);
+        }
+
+        .credit-display {
+            font-size: 1.5rem;
+            color: var(--google-blue);
+            font-weight: 700;
+        }
+
+        /* Online Time Display */
+        .online-time-card {
+            background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1));
+            border: 2px solid var(--google-blue);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .time-label {
+            font-size: 0.9rem;
+            color: var(--google-text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .time-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--google-blue);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 8px;
+        }
+
+        .time-details {
+            font-size: 0.9rem;
+            color: var(--google-text-light);
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-table th {
+            background: var(--google-gray-light);
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--google-text);
+            border-bottom: 2px solid var(--google-gray);
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--google-gray);
+        }
+
+        .data-table tr:hover {
+            background: rgba(66, 133, 244, 0.02);
+        }
+
+        .balance-cell {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .balance-high { color: var(--google-green); }
+        .balance-medium { color: var(--google-yellow); }
+        .balance-low { color: var(--google-red); }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-active {
+            background: rgba(52, 168, 83, 0.1);
+            color: var(--google-green);
+            border: 1px solid rgba(52, 168, 83, 0.3);
+        }
+
+        .status-inactive {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--google-red);
+            border: 1px solid rgba(234, 67, 53, 0.3);
+        }
+
+        .status-banned {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8B5CF6;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(251, 188, 5, 0.1);
+            color: var(--google-yellow);
+            border: 1px solid rgba(251, 188, 5, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Approval Items */
+        .approval-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .approval-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--google-gray);
+            transition: var(--transition);
+        }
+
+        .approval-item:hover {
+            border-color: var(--google-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .approval-info {
+            flex: 1;
+        }
+
+        .approval-amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--google-dark);
+            margin-bottom: 4px;
+        }
+
+        .approval-time {
+            font-size: 0.9rem;
+            color: var(--google-text-light);
+        }
+
+        .approval-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .badge-common {
+            background: rgba(66, 133, 244, 0.1);
+            color: var(--google-blue);
+            border: 1px solid rgba(66, 133, 244, 0.3);
+        }
+
+        .badge-rare {
+            background: rgba(251, 188, 5, 0.1);
+            color: var(--google-yellow);
+            border: 1px solid rgba(251, 188, 5, 0.3);
+        }
+
+        .badge-very-rare {
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--google-red);
+            border: 1px solid rgba(234, 67, 53, 0.3);
+        }
+
+        /* Analytics Cards */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .analytics-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--google-gray);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .analytics-card:hover {
+            border-color: var(--google-blue);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--google-text-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--google-blue);
+            margin-bottom: 4px;
+        }
+
+        .stat-subvalue {
+            font-size: 0.85rem;
+            color: var(--google-text-light);
+        }
+
+        /* Statement Items */
+        .statement-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--google-gray);
+        }
+
+        .statement-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--google-gray);
+        }
+
+        .statement-item:last-child {
+            border-bottom: none;
+        }
+
+        .statement-amount {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .statement-credit { color: var(--google-green); }
+        .statement-debit { color: var(--google-red); }
+
+        .statement-time {
+            font-size: 0.85rem;
+            color: var(--google-text-light);
+            margin-top: 4px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 24px;
+            background: var(--google-gray-light);
+            border-bottom: 1px solid var(--google-gray);
+        }
+
+        .modal-header h3 {
+            color: var(--google-dark);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 20px 24px;
+            background: var(--google-gray-light);
+            border-top: 1px solid var(--google-gray);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Admin Key Modal */
+        .admin-key-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--google-gray);
+            border-radius: var(--radius-sm);
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 8px;
+            font-weight: 600;
+            color: var(--google-dark);
+            transition: var(--transition);
+        }
+
+        .admin-key-input:focus {
+            outline: none;
+            border-color: var(--google-blue);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        /* Warning Boxes */
+        .warning-box {
+            padding: 16px;
+            border-radius: var(--radius);
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .warning-danger {
+            background: rgba(234, 67, 53, 0.1);
+            border: 1px solid rgba(234, 67, 53, 0.3);
+            color: var(--google-red);
+        }
+
+        .warning-warning {
+            background: rgba(251, 188, 5, 0.1);
+            border: 1px solid rgba(251, 188, 5, 0.3);
+            color: var(--google-yellow);
+        }
+
+        .warning-info {
+            background: rgba(66, 133, 244, 0.1);
+            border: 1px solid rgba(66, 133, 244, 0.3);
+            color: var(--google-blue);
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--google-text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--google-dark);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification-success {
+            border-left: 4px solid var(--google-green);
+        }
+
+        .notification-error {
+            border-left: 4px solid var(--google-red);
+        }
+
+        .notification-info {
+            border-left: 4px solid var(--google-blue);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .approval-item {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 16px;
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--google-text-light); }
+        .mt-1 { margin-top: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mt-3 { margin-top: 24px; }
+        .mb-1 { margin-bottom: 8px; }
+        .mb-2 { margin-bottom: 16px; }
+        .mb-3 { margin-bottom: 24px; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .w-full { width: 100%; }
+    </style>
+</head>
+<body>
+    <!-- Admin Key Verification Modal -->
+    <div class="modal" id="adminKeyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Security Verification</h3>
+            </div>
+            <div class="modal-body">
+                <div class="warning-box warning-info">
+                    <i class="fas fa-lock"></i>
+                    <div>Please enter the admin key to continue</div>
+                </div>
+                <input type="password" id="adminKeyInput" class="admin-key-input" placeholder="____" maxlength="4">
+                <div id="keyError" class="warning-box warning-danger hidden mt-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>Invalid admin key. Please try again.</div>
+                </div>
+                <div id="attemptsWarning" class="text-muted text-center mt-2">
+                    Attempts remaining: <span id="attemptsCount" class="font-bold">3</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="verifyKeyBtn" class="btn btn-primary w-full">
+                    <i class="fas fa-check"></i> Verify & Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent" class="hidden">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <span class="google-colors">Google Playcode</span>
+                <i class="fas fa-database" style="color: #4285F4;"></i>
+            </div>
+            <div class="tagline">Advanced Data Management System - Load and manage your Playcode data files</div>
+        </div>
+
+        <!-- File Management Card -->
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-file-upload"></i> Load & Save Data File</h2>
+            <div class="btn-group">
+                <label class="btn btn-secondary btn-file">
+                    <i class="fas fa-folder-open"></i> Choose JSON File
+                    <input type="file" id="jsonFileInput" accept=".json">
+                </label>
+                <button id="loadDataBtn" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Load Data
+                </button>
+                <button id="saveDataBtn" class="btn btn-success">
+                    <i class="fas fa-save"></i> Save All Data
+                </button>
+                <button id="editCreditBtn" class="btn btn-purple">
+                    <i class="fas fa-edit"></i> Edit Credit
+                </button>
+                <button id="clearAllBtn" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Clear All Data
+                </button>
+            </div>
+            <div id="fileInfo" class="text-muted mt-3 text-center"></div>
+        </div>
+
+        <!-- Data Display Area -->
+        <div id="dataDisplay" class="hidden">
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <div class="tabs" id="tabs">
+                    <button class="tab active" data-tab="userInfo">
+                        <i class="fas fa-user-circle"></i> User Info
+                    </button>
+                    <button class="tab" data-tab="members">
+                        <i class="fas fa-users"></i> Members Data
+                    </button>
+                    <button class="tab" data-tab="approvals">
+                        <i class="fas fa-check-circle"></i> Approvals
+                    </button>
+                    <button class="tab" data-tab="analytics">
+                        <i class="fas fa-chart-line"></i> Analytics
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Information Tab -->
+            <div class="tab-content active" id="userInfoTab">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-user-circle"></i> User Account Information</h2>
+                    
+                    <!-- Online Time Display -->
+                    <div class="online-time-card" id="onlineTimeDisplay">
+                        <div class="time-label">TOTAL ONLINE TIME</div>
+                        <div class="time-value" id="totalOnlineTime">0h 0m</div>
+                        <div class="time-details" id="onlineTimeDetails">Calculating session data...</div>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-user"></i> User ID
+                            </div>
+                            <div class="info-value" id="displayUserId">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-key"></i> Password
+                            </div>
+                            <div class="info-value" id="displayPassword">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-wallet"></i> Current Credit
+                            </div>
+                            <div class="info-value">
+                                <span class="credit-display" id="displayCredit">-</span>
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-users"></i> Total Members
+                            </div>
+                            <div class="info-value" id="displayMemberCount">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-check-circle"></i> Approval Codes
+                            </div>
+                            <div class="info-value" id="displayApprovalCount">-</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-label">
+                                <i class="fas fa-calendar-alt"></i> Account Created
+                            </div>
+                            <div class="info-value" id="displayCreatedDate">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Members Data Tab -->
+            <div class="tab-content" id="membersTab">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-users"></i> Members Management</h2>
+                    <div class="btn-group">
+                        <button id="exportMembersBtn" class="btn btn-success">
+                            <i class="fas fa-file-export"></i> Export Members Data
+                        </button>
+                        <button id="clearMembersBtn" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Clear All Members
+                        </button>
+                        <button id="activateAllBtn" class="btn btn-success">
+                            <i class="fas fa-check-circle"></i> Activate All Members
+                        </button>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Account No</th>
+                                    <th>SAR No</th>
+                                    <th>Balance</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="membersTableBody">
+                                <!-- Members data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approvals Tab -->
+            <div class="tab-content" id="approvalsTab">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-check-circle"></i> Approval Codes Management</h2>
+                    <div class="btn-group">
+                        <button id="exportApprovalsBtn" class="btn btn-success">
+                            <i class="fas fa-file-export"></i> Export Approvals Data
+                        </button>
+                        <button id="clearApprovalsBtn" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Clear All Approvals
+                        </button>
+                        <button id="showApprovedOnlyBtn" class="btn btn-secondary">
+                            <i class="fas fa-check"></i> Approved Only
+                        </button>
+                        <button id="showPendingOnlyBtn" class="btn btn-secondary">
+                            <i class="fas fa-clock"></i> Pending Only
+                        </button>
+                        <button id="showAllApprovalsBtn" class="btn btn-primary">
+                            <i class="fas fa-list"></i> Show All
+                        </button>
+                    </div>
+                    
+                    <div class="approval-list mt-3" id="approvalsList">
+                        <!-- Approval items will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analyticsTab">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-chart-line"></i> Session Analytics</h2>
+                    
+                    <div class="btn-group">
+                        <button id="exportAnalyticsBtn" class="btn btn-success">
+                            <i class="fas fa-file-export"></i> Export Analytics Data
+                        </button>
+                        <button id="clearAnalyticsBtn" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Clear Analytics
+                        </button>
+                    </div>
+                    
+                    <div class="analytics-grid mt-3">
+                        <div class="analytics-card">
+                            <div class="stat-label">TOTAL ONLINE TIME</div>
+                            <div class="stat-value" id="analyticsTotalTime">0h 0m</div>
+                            <div class="stat-subvalue" id="analyticsTimeDetails">All sessions combined</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="stat-label">APPROVALS PROCESSED</div>
+                            <div class="stat-value" id="totalApprovals">0</div>
+                            <div class="stat-subvalue">Approved + Rejected</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="stat-label">CREDIT PROCESSED</div>
+                            <div class="stat-value" id="totalCreditProcessed">0</div>
+                            <div class="stat-subvalue">Total credit in approvals</div>
+                        </div>
+                        <div class="analytics-card">
+                            <div class="stat-label">AVG. REQUEST SIZE</div>
+                            <div class="stat-value" id="avgRequestSize">0</div>
+                            <div class="stat-subvalue">Average credit per request</div>
+                        </div>
+                    </div>
+
+                    <h3 class="card-title mt-3"><i class="fas fa-history"></i> Recent Activity</h3>
+                    <div class="statement-container" id="sessionHistory">
+                        <!-- Session history will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Action Modal -->
+    <div class="modal" id="actionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-edit"></i> Member Action</h3>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <div class="text-muted mb-2">What action do you want to perform on member</div>
+                    <div class="info-value" id="modalMemberName">-</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="deactivateBtn" class="btn btn-warning">
+                    <i class="fas fa-user-slash"></i> Deactivate
+                </button>
+                <button id="banBtn" class="btn btn-danger">
+                    <i class="fas fa-ban"></i> Ban
+                </button>
+                <button id="cancelActionBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Credit Modal -->
+    <div class="modal" id="editCreditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Credit Balance</h3>
+            </div>
+            <div class="modal-body">
+                <div class="info-card text-center mb-3">
+                    <div class="info-label">Current Credit Balance</div>
+                    <div class="credit-display" id="currentCreditAmount">0</div>
+                </div>
+                <input type="number" id="newCreditInput" class="form-input" placeholder="Enter new credit amount" min="0">
+                <div id="editCreditError" class="warning-box warning-danger hidden mt-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>Please enter a valid credit amount</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmEditCreditBtn" class="btn btn-purple">
+                    <i class="fas fa-check"></i> Update Credit
+                </button>
+                <button id="cancelEditCreditBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Analytics Modal -->
+    <div class="modal" id="clearAnalyticsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-trash-alt"></i> Clear Session Analytics</h3>
+            </div>
+            <div class="modal-body">
+                <div class="warning-box warning-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>Are you sure you want to clear all session analytics data?</div>
+                </div>
+                <div class="text-muted mt-3">
+                    This will reset:
+                    <ul class="mt-2" style="padding-left: 20px;">
+                        <li>Session start time</li>
+                        <li>Statement history</li>
+                        <li>Online time tracking</li>
+                    </ul>
+                    <div class="mt-2"><strong>This action cannot be undone.</strong></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmClearAnalyticsBtn" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Clear Analytics
+                </button>
+                <button id="cancelClearAnalyticsBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- ALL YOUR ORIGINAL JAVASCRIPT CODE GOES HERE -->
+    <script>
+        // Admin Keys
+        const ADMIN_KEYS = ["1583", "3773", "0308"];
+        let attemptsLeft = 3;
+        let isVerified = false;
+        
+        let currentData = null;
+        let currentMemberId = null;
+        
+        // DOM Elements for Admin Key
+        const adminKeyModal = document.getElementById('adminKeyModal');
+        const adminKeyInput = document.getElementById('adminKeyInput');
+        const verifyKeyBtn = document.getElementById('verifyKeyBtn');
+        const keyError = document.getElementById('keyError');
+        const attemptsWarning = document.getElementById('attemptsWarning');
+        const attemptsCount = document.getElementById('attemptsCount');
+        const mainContent = document.getElementById('mainContent');
+        
+        // NEW DOM Elements for Online Time Feature
+        const onlineTimeDisplay = document.getElementById('onlineTimeDisplay');
+        const totalOnlineTime = document.getElementById('totalOnlineTime');
+        const onlineTimeDetails = document.getElementById('onlineTimeDetails');
+        const analyticsTotalTime = document.getElementById('analyticsTotalTime');
+        const analyticsTimeDetails = document.getElementById('analyticsTimeDetails');
+        const totalApprovals = document.getElementById('totalApprovals');
+        const totalCreditProcessed = document.getElementById('totalCreditProcessed');
+        const avgRequestSize = document.getElementById('avgRequestSize');
+        const sessionHistory = document.getElementById('sessionHistory');
+        
+        // NEW: Analytics buttons
+        const exportAnalyticsBtn = document.getElementById('exportAnalyticsBtn');
+        const clearAnalyticsBtn = document.getElementById('clearAnalyticsBtn');
+        const clearAnalyticsModal = document.getElementById('clearAnalyticsModal');
+        const confirmClearAnalyticsBtn = document.getElementById('confirmClearAnalyticsBtn');
+        const cancelClearAnalyticsBtn = document.getElementById('cancelClearAnalyticsBtn');
+        
+        // Admin Key Verification
+        function verifyAdminKey() {
+            const enteredKey = adminKeyInput.value.trim();
+            
+            if (ADMIN_KEYS.includes(enteredKey)) {
+                isVerified = true;
+                adminKeyModal.style.display = 'none';
+                mainContent.style.display = 'block';
+                sessionStorage.setItem('adminVerified', 'true');
+            } else {
+                attemptsLeft--;
+                attemptsCount.textContent = attemptsLeft;
+                keyError.classList.remove('hidden');
+                adminKeyInput.value = '';
+                adminKeyInput.focus();
+                
+                if (attemptsLeft <= 0) {
+                    showNotification('Too many failed attempts. Please refresh the page and try again.');
+                    adminKeyInput.disabled = true;
+                    verifyKeyBtn.disabled = true;
+                }
+            }
+        }
+        
+        // Check if already verified in this session
+        if (sessionStorage.getItem('adminVerified') === 'true') {
+            isVerified = true;
+            adminKeyModal.style.display = 'none';
+            mainContent.style.display = 'block';
+        } else {
+            adminKeyModal.style.display = 'flex';
+            mainContent.style.display = 'none';
+        }
+        
+        // Event Listeners for Admin Key
+        verifyKeyBtn.addEventListener('click', verifyAdminKey);
+        
+        adminKeyInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                verifyAdminKey();
+            }
+        });
+        
+        // Only allow numbers in admin key input
+        adminKeyInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+        
+        // FIXED: Tab Switching Functionality
+        function initializeTabSwitching() {
+            const tabButtons = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    button.classList.add('active');
+                    
+                    // Show corresponding content
+                    const contentId = tabId + 'Tab';
+                    const contentElement = document.getElementById(contentId);
+                    if (contentElement) {
+                        contentElement.classList.add('active');
+                        
+                        // Load data if needed
+                        if (tabId === 'members' && currentData) {
+                            displayMembersData(currentData.appData.members);
+                        } else if (tabId === 'approvals' && currentData) {
+                            displayApprovalsData(currentData.appData.approvals);
+                        } else if (tabId === 'analytics' && currentData) {
+                            updateOnlineTimeDisplay();
+                            calculateAnalytics();
+                            renderSessionHistory();
+                        }
+                    }
+                });
+            });
+        }
+        
+        // FIXED: Online Time Calculation - Data Manager should NOT increase online time
+        function calculateTotalOnlineTime() {
+            if (!currentData || !currentData.appData || !currentData.appData.meta) {
+                return { totalMinutes: 0, hours: 0, minutes: 0 };
+            }
+            
+            let totalMinutes = 0;
+            
+            // FIXED: Only use stored online time, don't calculate from current time
+            if (currentData.appData.meta.onlineTime && currentData.appData.meta.onlineTime.totalSeconds) {
+                // Use the stored online time from Playcode system
+                totalMinutes = currentData.appData.meta.onlineTime.totalSeconds / 60;
+                
+                // Add current session time if available and system was online
+                if (currentData.appData.meta.onlineTime.currentSessionSeconds) {
+                    totalMinutes += currentData.appData.meta.onlineTime.currentSessionSeconds / 60;
+                }
+            }
+            // Fallback: Calculate from session start time (but don't use current time)
+            else if (currentData.appData.meta.sessionStart) {
+                const sessionStartTime = currentData.appData.meta.sessionStart;
+                // Use the original session start time, don't calculate from current time
+                const sessionEndTime = currentData.appData.meta.lastLogoutTime || sessionStartTime;
+                const sessionMinutes = (sessionEndTime - sessionStartTime) / (1000 * 60);
+                totalMinutes = sessionMinutes;
+            }
+            
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = Math.floor(totalMinutes % 60);
+            
+            return { totalMinutes, hours, minutes };
+        }
+        
+        function formatTime(hours, minutes) {
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            } else {
+                return `${minutes}m`;
+            }
+        }
+        
+        function updateOnlineTimeDisplay() {
+            if (!currentData) return;
+            
+            const timeData = calculateTotalOnlineTime();
+            const formattedTime = formatTime(timeData.hours, timeData.minutes);
+            
+            // Update all time displays
+            totalOnlineTime.textContent = formattedTime;
+            analyticsTotalTime.textContent = formattedTime;
+            
+            // Update details with calculation method info
+            let calculationMethod = "Based on stored session data";
+            if (currentData.appData.meta.onlineTime) {
+                calculationMethod = "Based on stored online time";
+            } else if (currentData.appData.meta.sessionStart) {
+                calculationMethod = "Based on session history";
+            }
+            
+            onlineTimeDetails.textContent = `${timeData.hours} hours ${timeData.minutes} minutes • ${calculationMethod}`;
+            
+            const approvalCount = currentData.appData.approvals.length;
+            analyticsTimeDetails.textContent = `${approvalCount} approvals processed`;
+        }
+        
+        function calculateAnalytics() {
+            if (!currentData) return;
+            
+            // Total approvals processed
+            const totalApprovalsCount = currentData.appData.approvals.filter(a => a.processed).length;
+            totalApprovals.textContent = totalApprovalsCount.toLocaleString();
+            
+            // Total credit processed
+            const totalCredit = currentData.appData.approvals.reduce((sum, approval) => sum + approval.amount, 0);
+            totalCreditProcessed.textContent = totalCredit.toLocaleString();
+            
+            // Average request size
+            const avgSize = currentData.appData.approvals.length > 0 ? 
+                Math.round(totalCredit / currentData.appData.approvals.length) : 0;
+            avgRequestSize.textContent = avgSize.toLocaleString();
+        }
+        
+        function renderSessionHistory() {
+            if (!currentData || !currentData.appData) {
+                sessionHistory.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><div>No session history available</div></div>';
+                return;
+            }
+            
+            // Use statementHistory from Playcode data
+            const statementData = currentData.appData.meta.statementHistory || [];
+            const recentStatements = statementData.slice(0, 20).reverse(); // Show latest 20 entries
+            
+            if (recentStatements.length === 0) {
+                sessionHistory.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><div>No recent activity</div></div>';
+                return;
+            }
+            
+            sessionHistory.innerHTML = recentStatements.map(statement => {
+                const date = new Date(statement.time);
+                const amountClass = statement.type.includes('approved') ? 'statement-debit' : 'statement-credit';
+                const amountPrefix = statement.type.includes('approved') ? '-' : '+';
+                
+                return `
+                    <div class="statement-item">
+                        <div>
+                            <div style="font-weight: 500;">
+                                ${getStatementTypeText(statement.type)}
+                                ${statement.status === 'pending' ? '⏳' : statement.status === 'approved' ? '✅' : '❌'}
+                            </div>
+                            <div class="statement-time">${date.toLocaleString()}</div>
+                        </div>
+                        <div class="statement-amount ${amountClass}">
+                            ${amountPrefix}${statement.amount.toLocaleString()}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getStatementTypeText(type) {
+            const types = {
+                'approval_request': 'Approval Request',
+                'approval_approved': 'Approval Deducted', 
+                'approval_rejected': 'Approval Rejected',
+                'credit_edit': 'Credit Edited'
+            };
+            return types[type] || type;
+        }
+        
+        // NEW: Clear Analytics Function
+        function clearSessionAnalytics() {
+            if (!currentData || !currentData.appData) return;
+            
+            // Reset session analytics data
+            currentData.appData.meta.sessionStart = Date.now();
+            currentData.appData.meta.statementHistory = [];
+            
+            // Reset online time tracking
+            if (currentData.appData.meta.onlineTime) {
+                currentData.appData.meta.onlineTime.totalSeconds = 0;
+                currentData.appData.meta.onlineTime.currentSessionStart = null;
+                currentData.appData.meta.onlineTime.currentSessionSeconds = 0;
+            }
+            
+            currentData.appData.meta.lastLogoutTime = null;
+            
+            // Update display
+            updateOnlineTimeDisplay();
+            calculateAnalytics();
+            renderSessionHistory();
+            
+            showNotification('Session analytics data cleared successfully!');
+        }
+        
+        // NEW: Export Analytics Function
+        function exportAnalyticsData() {
+            if (!currentData) {
+                showNotification('No data loaded to export');
+                return;
+            }
+            
+            const analyticsData = {
+                userInfo: currentData.userInfo,
+                analytics: {
+                    totalOnlineTime: calculateTotalOnlineTime(),
+                    totalApprovals: currentData.appData.approvals.length,
+                    processedApprovals: currentData.appData.approvals.filter(a => a.processed).length,
+                    totalCreditProcessed: currentData.appData.approvals.reduce((sum, a) => sum + a.amount, 0),
+                    statementHistory: currentData.appData.meta.statementHistory || []
+                },
+                exportDate: new Date().toISOString()
+            };
+            
+            downloadJSON(analyticsData, `${currentData.userInfo.id}_analytics_export.json`);
+        }
+        
+        // Modified displayData function to include online time
+        function displayData(data) {
+            dataDisplay.classList.remove('hidden');
+            
+            // Display User Information
+            displayUserId.textContent = data.userInfo.id;
+            displayPassword.textContent = data.userInfo.pass;
+            displayCredit.textContent = data.appData.credit.toLocaleString();
+            displayMemberCount.textContent = data.appData.members.length;
+            displayApprovalCount.textContent = data.appData.approvals.length;
+            
+            const createdDate = data.appData.meta?.created ? 
+                new Date(data.appData.meta.created).toLocaleDateString() : 'Unknown';
+            displayCreatedDate.textContent = createdDate;
+            
+            // NEW: Update online time display
+            updateOnlineTimeDisplay();
+            calculateAnalytics();
+            renderSessionHistory();
+            
+            // Display other data
+            displayMembersData(data.appData.members);
+            displayApprovalsData(data.appData.approvals);
+        }
+        
+        // Initialize tab switching
+        initializeTabSwitching();
+        
+        // Edit Credit Modal Elements
+        const editCreditModal = document.getElementById('editCreditModal');
+        const editCreditBtn = document.getElementById('editCreditBtn');
+        const currentCreditAmount = document.getElementById('currentCreditAmount');
+        const newCreditInput = document.getElementById('newCreditInput');
+        const confirmEditCreditBtn = document.getElementById('confirmEditCreditBtn');
+        const cancelEditCreditBtn = document.getElementById('cancelEditCreditBtn');
+        const editCreditError = document.getElementById('editCreditError');
+        
+        // Edit Credit Functions
+        function openEditCreditModal() {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (!currentData) {
+                showNotification('Please load data first');
+                return;
+            }
+            
+            currentCreditAmount.textContent = currentData.appData.credit.toLocaleString();
+            newCreditInput.value = currentData.appData.credit;
+            editCreditError.classList.add('hidden');
+            editCreditModal.style.display = 'flex';
+            newCreditInput.focus();
+        }
+        
+        function updateCredit() {
+            const newCredit = parseInt(newCreditInput.value);
+            
+            if (isNaN(newCredit) || newCredit < 0) {
+                editCreditError.textContent = 'Please enter a valid credit amount';
+                editCreditError.classList.remove('hidden');
+                return;
+            }
+            
+            currentData.appData.credit = newCredit;
+            displayCredit.textContent = newCredit.toLocaleString();
+            editCreditModal.style.display = 'none';
+            showNotification(`Credit updated to ${newCredit.toLocaleString()} successfully!`);
+        }
+        
+        // Event Listeners for Edit Credit
+        editCreditBtn.addEventListener('click', openEditCreditModal);
+        
+        confirmEditCreditBtn.addEventListener('click', updateCredit);
+        
+        cancelEditCreditBtn.addEventListener('click', () => {
+            editCreditModal.style.display = 'none';
+        });
+        
+        newCreditInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                updateCredit();
+            }
+        });
+        
+        // Only allow numbers in credit input
+        newCreditInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+        
+        // NEW: Analytics Event Listeners
+        exportAnalyticsBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            exportAnalyticsData();
+        });
+        
+        clearAnalyticsBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            clearAnalyticsModal.style.display = 'flex';
+        });
+        
+        confirmClearAnalyticsBtn.addEventListener('click', () => {
+            clearSessionAnalytics();
+            clearAnalyticsModal.style.display = 'none';
+        });
+        
+        cancelClearAnalyticsBtn.addEventListener('click', () => {
+            clearAnalyticsModal.style.display = 'none';
+        });
+        
+        // DOM Elements
+        const jsonFileInput = document.getElementById('jsonFileInput');
+        const loadDataBtn = document.getElementById('loadDataBtn');
+        const saveDataBtn = document.getElementById('saveDataBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const dataDisplay = document.getElementById('dataDisplay');
+        
+        // User Info Elements
+        const displayUserId = document.getElementById('displayUserId');
+        const displayPassword = document.getElementById('displayPassword');
+        const displayCredit = document.getElementById('displayCredit');
+        const displayMemberCount = document.getElementById('displayMemberCount');
+        const displayApprovalCount = document.getElementById('displayApprovalCount');
+        const displayCreatedDate = document.getElementById('displayCreatedDate');
+        
+        // Members Tab Elements
+        const membersTableBody = document.getElementById('membersTableBody');
+        const exportMembersBtn = document.getElementById('exportMembersBtn');
+        const clearMembersBtn = document.getElementById('clearMembersBtn');
+        const activateAllBtn = document.getElementById('activateAllBtn');
+        
+        // Approvals Tab Elements
+        const approvalsList = document.getElementById('approvalsList');
+        const exportApprovalsBtn = document.getElementById('exportApprovalsBtn');
+        const clearApprovalsBtn = document.getElementById('clearApprovalsBtn');
+        const showApprovedOnlyBtn = document.getElementById('showApprovedOnlyBtn');
+        const showPendingOnlyBtn = document.getElementById('showPendingOnlyBtn');
+        const showAllApprovalsBtn = document.getElementById('showAllApprovalsBtn');
+        
+        // Action Modal Elements
+        const actionModal = document.getElementById('actionModal');
+        const modalMemberName = document.getElementById('modalMemberName');
+        const deactivateBtn = document.getElementById('deactivateBtn');
+        const banBtn = document.getElementById('banBtn');
+        const cancelActionBtn = document.getElementById('cancelActionBtn');
+        
+        // Load Data Function
+        loadDataBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            const file = jsonFileInput.files[0];
+            if (!file) {
+                showNotification('Please select a JSON file first');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    currentData = parsedData;
+                    
+                    if (validateData(parsedData)) {
+                        displayData(parsedData);
+                        fileInfo.textContent = `File loaded: ${file.name} (${new Date().toLocaleString()})`;
+                        fileInfo.style.color = 'var(--google-green)';
+                    } else {
+                        showNotification('Invalid data format. Please select a valid Playcode JSON file.');
+                    }
+                } catch (error) {
+                    showNotification('Error reading file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        // Save All Data Function
+        saveDataBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (!currentData) {
+                showNotification('No data loaded to save');
+                return;
+            }
+            
+            const updatedData = {
+                ...currentData,
+                exportDate: new Date().toISOString(),
+                exportedBy: 'Data Manager'
+            };
+            
+            downloadJSON(updatedData, `${currentData.userInfo.id}_complete_data_${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+            fileInfo.textContent = `Data saved successfully! (${new Date().toLocaleString()})`;
+            fileInfo.style.color = 'var(--google-green)';
+        });
+        
+        // Validate Data Format
+        function validateData(data) {
+            return data && 
+                   data.userInfo && 
+                   data.userInfo.id && 
+                   data.appData && 
+                   Array.isArray(data.appData.members) && 
+                   Array.isArray(data.appData.approvals);
+        }
+        
+        // Display Members Data in Table
+        function displayMembersData(members) {
+            membersTableBody.innerHTML = '';
+            
+            if (members.length === 0) {
+                membersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <i class="fas fa-users-slash"></i>
+                            <div>No members found</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            members.forEach(member => {
+                const row = document.createElement('tr');
+                
+                const balanceClass = getBalanceStatus(member.balance);
+                const statusClass = `status-${member.status}`;
+                const statusText = member.status.charAt(0).toUpperCase() + member.status.slice(1);
+                
+                row.innerHTML = `
+                    <td>${escapeHtml(member.name)}</td>
+                    <td>${escapeHtml(member.account)}</td>
+                    <td>${escapeHtml(member.sar)}</td>
+                    <td class="balance-cell ${balanceClass}">${member.balance.toLocaleString()}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            ${member.status === 'active' ? '✓' : member.status === 'banned' ? '⛔' : '✗'}
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            ${member.status === 'active' ? 
+                                `<button class="btn btn-warning btn-icon" data-id="${member.id}" title="Deactivate/Ban">
+                                    <i class="fas fa-user-slash"></i>
+                                </button>` :
+                                `<button class="btn btn-success btn-icon" data-id="${member.id}" title="Activate">
+                                    <i class="fas fa-user-check"></i>
+                                </button>`
+                            }
+                        </div>
+                    </td>
+                `;
+                
+                membersTableBody.appendChild(row);
+            });
+            
+            document.querySelectorAll('.btn-warning.btn-icon[data-id]').forEach(btn => {
+                btn.addEventListener('click', () => openActionModal(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.btn-success.btn-icon[data-id]').forEach(btn => {
+                btn.addEventListener('click', () => activateMember(btn.dataset.id));
+            });
+        }
+        
+        // Open Action Modal for Deactivate/Ban
+        function openActionModal(memberId) {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            const member = currentData.appData.members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            currentMemberId = memberId;
+            modalMemberName.textContent = member.name;
+            actionModal.style.display = 'flex';
+        }
+        
+        // Activate Member
+        function activateMember(memberId) {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            const member = currentData.appData.members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            member.status = 'active';
+            displayMembersData(currentData.appData.members);
+            showNotification(`Member "${member.name}" has been activated`);
+        }
+        
+        // Deactivate Member
+        function deactivateMember(memberId) {
+            const member = currentData.appData.members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            member.status = 'inactive';
+            displayMembersData(currentData.appData.members);
+            showNotification(`Member "${member.name}" has been deactivated`);
+        }
+        
+        // Ban Member
+        function banMember(memberId) {
+            const member = currentData.appData.members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            member.status = 'banned';
+            displayMembersData(currentData.appData.members);
+            showNotification(`Member "${member.name}" has been banned`);
+        }
+        
+        // Display Approvals Data
+        function displayApprovalsData(approvals, filter = 'all') {
+            approvalsList.innerHTML = '';
+            
+            let filteredApprovals = approvals;
+            
+            if (filter === 'approved') {
+                filteredApprovals = approvals.filter(a => a.processed && a.approved);
+            } else if (filter === 'pending') {
+                filteredApprovals = approvals.filter(a => !a.processed);
+            } else if (filter === 'rejected') {
+                filteredApprovals = approvals.filter(a => a.processed && !a.approved);
+            }
+            
+            if (filteredApprovals.length === 0) {
+                approvalsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle"></i>
+                        <div>No ${filter !== 'all' ? filter + ' ' : ''}approval codes found</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const sortedApprovals = [...filteredApprovals].sort((a, b) => b.time - a.time);
+            
+            sortedApprovals.forEach(approval => {
+                const item = document.createElement('div');
+                item.className = 'approval-item';
+                
+                const statusClass = approval.processed ? 
+                    (approval.approved ? 'status-active' : 'status-inactive') : 'status-pending';
+                
+                const statusText = approval.processed ? 
+                    (approval.approved ? 'Approved' : 'Rejected') : 'Pending';
+                
+                const amountClass = getApprovalAmountClass(approval.amount);
+                const badgeClass = approval.amount <= 500 ? 'badge-common' : 
+                                 approval.amount <= 5000 ? 'badge-rare' : 'badge-very-rare';
+                const badgeText = approval.amount <= 500 ? 'Common' : 
+                                approval.amount <= 5000 ? 'Rare' : 'Very Rare';
+                
+                item.innerHTML = `
+                    <div class="approval-info">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <div class="approval-amount ${amountClass}">${approval.amount.toLocaleString()} credit</div>
+                            <span class="approval-badge ${badgeClass}">${badgeText}</span>
+                            <span class="status-badge ${statusClass}">
+                                ${approval.processed ? (approval.approved ? '✓' : '✗') : '⏳'}
+                                ${statusText}
+                            </span>
+                        </div>
+                        <div class="approval-time">
+                            <i class="far fa-clock"></i>
+                            ${new Date(approval.time).toLocaleString()}
+                            ${approval.id ? ` • ID: ${approval.id.substring(0, 8)}` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                approvalsList.appendChild(item);
+            });
+        }
+        
+        // Get Balance Status Class
+        function getBalanceStatus(balance) {
+            if (balance >= 10000) return 'balance-high';
+            if (balance >= 5000) return 'balance-medium';
+            return 'balance-low';
+        }
+        
+        // Get Approval Amount Class
+        function getApprovalAmountClass(amount) {
+            if (amount <= 500) return 'balance-high';
+            if (amount <= 5000) return 'balance-medium';
+            return 'balance-low';
+        }
+        
+        // Export Members Data
+        exportMembersBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (!currentData || !currentData.appData.members.length) {
+                showNotification('No members data to export');
+                return;
+            }
+            
+            const membersData = {
+                exportedMembers: currentData.appData.members,
+                exportDate: new Date().toISOString(),
+                sourceUser: currentData.userInfo.id
+            };
+            
+            downloadJSON(membersData, `${currentData.userInfo.id}_members_export.json`);
+        });
+        
+        // Export Approvals Data
+        exportApprovalsBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (!currentData || !currentData.appData.approvals.length) {
+                showNotification('No approvals data to export');
+                return;
+            }
+            
+            const approvalsData = {
+                exportedApprovals: currentData.appData.approvals,
+                exportDate: new Date().toISOString(),
+                sourceUser: currentData.userInfo.id
+            };
+            
+            downloadJSON(approvalsData, `${currentData.userInfo.id}_approvals_export.json`);
+        });
+        
+        // Clear All Members
+        clearMembersBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (!currentData) return;
+            
+            if (confirm('Are you sure you want to clear ALL members data? This action cannot be undone.')) {
+                currentData.appData.members = [];
+                displayMembersData([]);
+                displayMemberCount.textContent = '0';
+                showNotification('All members data has been cleared');
+            }
+        });
+        
+        // Activate All Members
+        activateAllBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (!currentData) return;
+            
+            if (confirm('Are you sure you want to activate ALL members?')) {
+                currentData.appData.members.forEach(member => {
+                    member.status = 'active';
+                });
+                displayMembersData(currentData.appData.members);
+                showNotification('All members have been activated');
+            }
+        });
+        
+        // Clear All Approvals
+        clearApprovalsBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (!currentData) return;
+            
+            if (confirm('Are you sure you want to clear ALL approval codes? This action cannot be undone.')) {
+                currentData.appData.approvals = [];
+                displayApprovalsData([]);
+                displayApprovalCount.textContent = '0';
+                showNotification('All approval codes have been cleared');
+            }
+        });
+        
+        // Clear All Data
+        clearAllBtn.addEventListener('click', () => {
+            if (!isVerified) {
+                showNotification('Please verify admin access first');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to clear ALL loaded data? This will reset the display.')) {
+                currentData = null;
+                dataDisplay.classList.add('hidden');
+                jsonFileInput.value = '';
+                fileInfo.textContent = 'All data cleared';
+                fileInfo.style.color = 'var(--google-red)';
+                showNotification('All data cleared successfully');
+            }
+        });
+        
+        // Approval Filters
+        showApprovedOnlyBtn.addEventListener('click', () => {
+            if (currentData) {
+                displayApprovalsData(currentData.appData.approvals, 'approved');
+            }
+        });
+        
+        showPendingOnlyBtn.addEventListener('click', () => {
+            if (currentData) {
+                displayApprovalsData(currentData.appData.approvals, 'pending');
+            }
+        });
+        
+        showAllApprovalsBtn.addEventListener('click', () => {
+            if (currentData) {
+                displayApprovalsData(currentData.appData.approvals, 'all');
+            }
+        });
+        
+        // Action Modal Event Listeners
+        deactivateBtn.addEventListener('click', () => {
+            deactivateMember(currentMemberId);
+            actionModal.style.display = 'none';
+        });
+        
+        banBtn.addEventListener('click', () => {
+            banMember(currentMemberId);
+            actionModal.style.display = 'none';
+        });
+        
+        cancelActionBtn.addEventListener('click', () => {
+            actionModal.style.display = 'none';
+        });
+        
+        // Utility Functions
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function downloadJSON(data, filename) {
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showNotification('Data exported successfully!');
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification notification-info';
+            notification.innerHTML = `
+                <i class="fas fa-bell"></i>
+                <div>${message}</div>
+            `;
+            
+            document.getElementById('notificationContainer').appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+        
+        // Initialize
+        console.log('Google Playcode Data Manager loaded');
+        // Tab switching is now initialized properly
+    </script>
+</body>
+</html>
