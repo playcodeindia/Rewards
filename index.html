@@ -1,2080 +1,822 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Playcode Data Manager</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0E0E12">
+    <title>PlayCode Rewards+</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
     <style>
-        /* CSS Variables - Google Theme */
+        /* ==========================================================================
+           PLAYCODE REWARDS+ | PREMIUM MATERIAL 3 DARK UI
+           ========================================================================== */
+        
         :root {
-            --google-blue: #4285F4;
-            --google-red: #EA4335;
-            --google-yellow: #FBBC05;
-            --google-green: #34A853;
-            --google-dark: #202124;
-            --google-dark-light: #3C4043;
-            --google-light: #FFFFFF;
-            --google-gray-light: #F8F9FA;
-            --google-gray: #E8EAED;
-            --google-text: #202124;
-            --google-text-light: #5F6368;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
-            --radius-sm: 8px;
-            --radius: 12px;
-            --radius-lg: 16px;
-            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --md-sys-color-primary: #A8C7FA;
+            --md-sys-color-on-primary: #062E6F;
+            --md-sys-color-primary-container: #0842A0;
+            --md-sys-color-on-primary-container: #D3E3FD;
+            --md-sys-color-secondary: #C2C7CF;
+            --md-sys-color-secondary-container: #42474E;
+            --md-sys-color-on-secondary-container: #DEE3EB;
+            --md-sys-color-tertiary: #C4C3EA;
+            --md-sys-color-tertiary-container: #444465;
+            --md-sys-color-on-tertiary-container: #E2E0F9;
+            --md-sys-color-error: #FFB4AB;
+            --md-sys-color-background: #0E0E12;
+            --md-sys-color-on-background: #E2E2E6;
+            --md-sys-color-surface: #121216;
+            --md-sys-color-surface-container-lowest: #0C0C10;
+            --md-sys-color-surface-container-low: #1A1A1F;
+            --md-sys-color-surface-container: #1E1E24;
+            --md-sys-color-surface-container-high: #28282F;
+            --md-sys-color-surface-container-highest: #33333B;
+            --md-sys-color-on-surface: #E2E2E6;
+            --md-sys-color-on-surface-variant: #C4C6D0;
+            --md-sys-color-outline: #8E9099;
+            --md-sys-color-outline-variant: #44474E;
+            --md-sys-color-success: #6DD58C;
+            --md-sys-color-success-container: #0F5223;
+            
+            --font-display: 'Google Sans', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --radius-xs: 4px; --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 24px; --radius-xxl: 32px; --radius-full: 9999px;
+            
+            --elevation-1: 0 1px 3px 1px rgba(0,0,0,0.4), 0 1px 2px 0 rgba(0,0,0,0.3);
+            --elevation-2: 0 2px 6px 2px rgba(0,0,0,0.4), 0 1px 2px 0 rgba(0,0,0,0.3);
+            --elevation-3: 0 4px 8px 3px rgba(0,0,0,0.4), 0 1px 3px 0 rgba(0,0,0,0.3);
+            --elevation-glow: 0 0 20px rgba(168, 199, 250, 0.15);
+            
+            --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+            --easing-emphasized: cubic-bezier(0.2, 0, 0, 1.0);
+            --duration-short: 150ms;
+            --duration-medium: 300ms;
+            --duration-long: 500ms;
         }
 
-        /* Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--md-sys-color-surface-container-highest); border-radius: 10px; }
+        
+        body { font-family: var(--font-body); background-color: var(--md-sys-color-background); color: var(--md-sys-color-on-background); line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; position: relative; }
+
+        .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; pointer-events: none; }
+        .ambient-glow { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.15; }
+        .glow-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--md-sys-color-primary); }
+        .glow-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: var(--md-sys-color-tertiary); }
+
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); color: var(--md-sys-color-on-surface); }
+        .text-primary { color: var(--md-sys-color-primary) !important; }
+        .text-success { color: var(--md-sys-color-success) !important; }
+        .text-error { color: var(--md-sys-color-error) !important; }
+        .text-muted { color: var(--md-sys-color-on-surface-variant); }
+        .font-mono { font-family: var(--font-mono); }
+
+        .gp-logo { width: 48px; height: 48px; background: var(--md-sys-color-surface-container-high); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--elevation-2); overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .gp-logo::before { content: ''; position: absolute; inset: 0; opacity: 0.3; background: conic-gradient(from 90deg at 50% 50%, #4285F4 0deg 90deg, #EA4335 90deg 180deg, #FBBC05 180deg 270deg, #34A853 270deg 360deg); animation: spinBg 15s linear infinite; }
+        .gp-triangle { width: 0; height: 0; border-left: 16px solid var(--md-sys-color-primary); border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 6px; z-index: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        @keyframes spinBg { 100% { transform: rotate(360deg); } }
+
+        .form-group { margin-bottom: 24px; position: relative; }
+        .form-label { display: block; margin-bottom: 8px; color: var(--md-sys-color-on-surface-variant); font-size: 14px; font-weight: 500; font-family: var(--font-display); }
+        .form-control { width: 100%; padding: 16px 20px; background: var(--md-sys-color-surface-container-lowest); border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--radius-md); color: var(--md-sys-color-on-surface); font-size: 16px; font-family: var(--font-body); transition: all var(--duration-short) var(--easing-standard); }
+        .form-control:focus { outline: none; border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 4px rgba(168, 199, 250, 0.1); background: var(--md-sys-color-surface-container); }
+        .form-control::placeholder { color: var(--md-sys-color-outline); }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 28px; font-size: 15px; font-weight: 600; font-family: var(--font-display); border-radius: var(--radius-full); border: none; cursor: pointer; transition: all var(--duration-short) var(--easing-standard); position: relative; overflow: hidden; }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); box-shadow: var(--elevation-1); }
+        .btn-primary:hover { background: #BBD2FA; box-shadow: var(--elevation-2), var(--elevation-glow); }
+        .btn-secondary { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-primary); border: 1px solid var(--md-sys-color-outline-variant); }
+        .btn-secondary:hover { background: var(--md-sys-color-surface-container-highest); }
+        .btn-block { width: 100%; }
+        .btn-icon { padding: 8px; border-radius: 50%; min-width: auto; min-height: auto; }
+        
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--duration-medium) var(--easing-standard); }
+        .modal-backdrop.show { opacity: 1; }
+        .modal-surface { background: var(--md-sys-color-surface-container); border-radius: var(--radius-xl); width: 100%; max-width: 480px; border: 1px solid var(--md-sys-color-outline-variant); box-shadow: var(--elevation-3); transform: translateY(20px) scale(0.95); transition: all var(--duration-medium) var(--easing-emphasized); display: flex; flex-direction: column; max-height: 90vh; }
+        .modal-backdrop.show .modal-surface { transform: translateY(0) scale(1); }
+        .modal-header { padding: 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+        .modal-title { font-size: 20px; font-weight: 600; color: var(--md-sys-color-on-surface); }
+        .modal-body { padding: 24px; overflow-y: auto; }
+        .modal-footer { padding: 16px 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-surface-container-low); border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+        
+        .info-box { background: var(--md-sys-color-surface-container-highest); border-radius: var(--radius-md); padding: 16px; font-size: 13px; color: var(--md-sys-color-on-surface-variant); line-height: 1.6; border: 1px solid rgba(255,255,255,0.05); margin-top: 16px; }
+
+        .page { display: none; min-height: 100vh; animation: fadeUp var(--duration-long) var(--easing-emphasized) forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .auth-wrapper { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+        .auth-card { background: var(--md-sys-color-surface-container); border: 1px solid var(--md-sys-color-outline-variant); border-radius: var(--radius-xxl); padding: 48px 40px; width: 100%; max-width: 440px; box-shadow: var(--elevation-3); position: relative; z-index: 10; }
+        .auth-header-wrapper { text-align: center; margin-bottom: 40px; }
+        .auth-logo-container { display: flex; justify-content: center; margin-bottom: 24px; }
+        .auth-title { font-size: 32px; font-weight: 500; margin-bottom: 8px; letter-spacing: -0.5px; }
+        
+        .top-app-bar { position: sticky; top: 0; z-index: 100; background: rgba(18, 18, 22, 0.85); backdrop-filter: blur(4px); border-bottom: 1px solid var(--md-sys-color-outline-variant); padding: 16px 24px; }
+        .bar-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .brand { display: flex; align-items: center; gap: 16px; font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+        .brand-logo { width: 32px; height: 32px; } .brand-logo .gp-triangle { border-left-width: 12px; border-top-width: 8px; border-bottom-width: 8px; margin-left: 4px;}
+        .user-profile-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: border 0.2s; }
+        .user-profile-btn:hover { border-color: var(--md-sys-color-primary); }
+        
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 40px 24px 100px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .section-title { font-size: 28px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+        
+        .rewards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        .reward-card { background: var(--md-sys-color-surface-container); border-radius: var(--radius-xl); border: 1px solid var(--md-sys-color-outline-variant); padding: 24px; display: flex; flex-direction: column; transition: all var(--duration-medium) var(--easing-standard); position: relative; overflow: hidden; }
+        .reward-card:hover { transform: translateY(-6px); box-shadow: var(--elevation-3); border-color: var(--md-sys-color-primary); }
+        .reward-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--md-sys-color-primary), var(--md-sys-color-tertiary)); opacity: 0; transition: opacity 0.3s; }
+        .reward-card:hover::before { opacity: 1; }
+        .rc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .rc-icon { width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); display: flex; align-items: center; justify-content: center; }
+        .rc-status { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 10px; border-radius: var(--radius-full); background: rgba(255,255,255,0.1); }
+        .rc-status.active { background: var(--md-sys-color-success-container); color: var(--md-sys-color-on-success-container); }
+        .rc-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; line-height: 1.3; }
+        .rc-meta { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--md-sys-color-error); margin-bottom: 24px; font-weight: 500; }
+        .rc-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; }
+        
+        .search-container { position: relative; margin-bottom: 24px; }
+        .search-container .material-icons-round { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--md-sys-color-outline); }
+        .search-container input { padding-left: 48px; background: var(--md-sys-color-surface-container-highest); border: none; }
+        .user-list { max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .user-list-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--md-sys-color-surface-container-low); border-radius: var(--radius-md); cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+        .user-list-item:hover { background: var(--md-sys-color-surface-container-highest); border-color: var(--md-sys-color-primary); }
+        .uli-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); display: flex; align-items: center; justify-content: center; font-weight: 600; }
+        .uli-details { flex: 1; }
+        .uli-name { font-weight: 600; color: var(--md-sys-color-on-surface); font-size: 15px; }
+        .uli-acc { font-size: 13px; color: var(--md-sys-color-outline); font-family: var(--font-mono); margin-top: 2px; }
+
+        .data-table-wrapper { background: var(--md-sys-color-surface-container); border-radius: var(--radius-xl); border: 1px solid var(--md-sys-color-outline-variant); overflow: hidden; box-shadow: var(--elevation-1); }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .data-table th { padding: 16px 24px; background: var(--md-sys-color-surface-container-highest); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--md-sys-color-on-surface-variant); border-bottom: 1px solid var(--md-sys-color-outline-variant); }
+        .data-table td { padding: 16px 24px; border-bottom: 1px solid var(--md-sys-color-outline-variant); font-size: 14px; vertical-align: middle; }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* ==========================================================================
+           ACTIVATION SEQUENCE: 100% PURE CSS CONTROL (NO INLINE JS CONFLICTS)
+           ========================================================================== */
+        .activation-overlay { position: fixed; inset: 0; background: var(--md-sys-color-background); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .anim-stage { display: flex; align-items: center; justify-content: center; gap: 32px; width: 100%; max-width: 600px; padding: 0 24px; transition: all 0.4s ease; }
+        
+        .anim-node { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.5); }
+        .node-playcode { background: var(--md-sys-color-surface-container-high); box-shadow: 0 0 30px rgba(168,199,250,0.2); }
+        .node-user { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-size: 32px; font-weight: 700; box-shadow: 0 0 30px rgba(168,199,250,0.5); }
+        
+        .anim-connector { flex: 1; height: 6px; background: var(--md-sys-color-surface-container-highest); border-radius: 3px; position: relative; overflow: hidden; opacity: 0; }
+        
+        .anim-glow-bar { position: absolute; top: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--md-sys-color-success), transparent); box-shadow: 0 0 15px var(--md-sys-color-success); }
+
+        .seq-1 .node-playcode { animation: popIn 0.5s ease forwards; }
+        .seq-2 .anim-connector { opacity: 1; } 
+        .seq-2 .anim-glow-bar { animation: shootRight 1.2s linear infinite; }
+        
+        .seq-2-rev .anim-connector { opacity: 1; } 
+        .seq-2-rev .anim-glow-bar { animation: shootLeft 1.2s linear infinite; }
+        
+        .seq-3 .node-user { animation: popIn 0.5s ease forwards; }
+        
+        /* FINAL TICK CONTAINER - By default HIDDEN */
+        .final-tick-container { display: none; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 400px; padding: 24px; }
+        
+        /* MAGIC FIX: When seq-4 is added, purely hide stage and show tick via CSS */
+        .seq-4 .anim-stage { display: none !important; }
+        .seq-4 .final-tick-container { display: flex !important; animation: fadeInTickArea 0.4s ease forwards; }
+        
+        /* EPIC SPLASH BLUE TICK (PURE SVG - NO INTERNET NEEDED) */
+        .success-circle { 
+            width: 100px; 
+            height: 100px; 
+            border-radius: 50%; 
+            background: #4285F4; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 0 30px rgba(66, 133, 244, 0.4); 
+            position: relative; 
+            transform: scale(0); 
+        }
+        .seq-4 .success-circle { 
+            animation: gpaySplashIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+        }
+        
+        /* Ripple Effect */
+        .success-circle::before { 
+            content: ''; 
+            position: absolute; 
+            inset: -10px; 
+            border-radius: 50%; 
+            border: 4px solid #4285F4; 
+            opacity: 0; 
+            z-index: -1; 
+        }
+        .seq-4 .success-circle::before { 
+            animation: rippleSplash 1s ease-out forwards 0.3s; 
         }
 
-        body {
-            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e8f0fe 100%);
-            color: var(--google-text);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Header Styles */
-        .header {
-            text-align: center;
-            padding: 30px 0;
-            margin-bottom: 20px;
-        }
-
-        .logo {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .google-colors {
-            background: linear-gradient(90deg, 
-                var(--google-blue) 0%, 
-                var(--google-blue) 25%, 
-                var(--google-red) 25%, 
-                var(--google-red) 50%, 
-                var(--google-yellow) 50%, 
-                var(--google-yellow) 75%, 
-                var(--google-green) 75%, 
-                var(--google-green) 100%
-            );
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -1px;
-        }
-
-        .tagline {
-            font-size: 1.2rem;
-            color: var(--google-text-light);
-            font-weight: 400;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Card Styles - Google Material Design */
-        .card {
-            background: var(--google-light);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid var(--google-gray);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--google-dark);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-title i {
-            color: var(--google-blue);
-        }
-
-        /* Form Elements - Google Style */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--google-text);
-            font-size: 0.95rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid var(--google-gray);
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            font-family: 'Google Sans', sans-serif;
-            transition: var(--transition);
-            background: var(--google-light);
-            color: var(--google-text);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--google-blue);
-            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        /* Button Styles - Google Material */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 24px;
-            border-radius: var(--radius-sm);
-            font-weight: 500;
-            font-size: 15px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            text-decoration: none;
-            font-family: 'Google Sans', sans-serif;
-        }
-
-        .btn-primary {
-            background: var(--google-blue);
-            color: white;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-primary:hover {
-            background: #3367d6;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--google-blue);
-            border: 1px solid var(--google-gray);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(66, 133, 244, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: var(--google-green);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #2e8b57;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: var(--google-red);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #d33426;
-            transform: translateY(-2px);
-        }
-
-        .btn-warning {
-            background: var(--google-yellow);
-            color: var(--google-dark);
-        }
-
-        .btn-warning:hover {
-            background: #f9ab00;
-            transform: translateY(-2px);
-        }
-
-        .btn-purple {
-            background: linear-gradient(135deg, #8B5CF6, #6366F1);
-            color: white;
-        }
-
-        .btn-purple:hover {
-            background: linear-gradient(135deg, #7C3AED, #4F46E5);
-            transform: translateY(-2px);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .btn-file {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-file input[type="file"] {
-            position: absolute;
-            top: 0;
-            right: 0;
-            min-width: 100%;
-            min-height: 100%;
-            font-size: 100px;
-            text-align: right;
-            filter: alpha(opacity=0);
+        /* SVG Tick Draw Animation */
+        .checkmark { width: 50px; height: 50px; stroke: white; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke-dasharray: 100; stroke-dashoffset: 100; }
+        .seq-4 .checkmark { animation: drawTick 0.5s ease-out forwards 0.4s; }
+        
+        /* CRT Box */
+        .crt-box { 
+            background: #000; border: 2px solid var(--md-sys-color-success); border-radius: var(--radius-md); padding: 24px; position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(109,213,140,0.3); text-align: center; 
             opacity: 0;
-            outline: none;
-            background: white;
-            cursor: inherit;
-            display: block;
-        }
-
-        /* Tab Styles */
-        .tabs-container {
-            margin: 24px 0;
-            border-bottom: 2px solid var(--google-gray);
-        }
-
-        .tabs {
-            display: flex;
-            gap: 4px;
-            overflow-x: auto;
-            padding-bottom: 2px;
-        }
-
-        .tab {
-            padding: 14px 24px;
-            background: transparent;
-            border: none;
-            color: var(--google-text-light);
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .tab:hover {
-            background: rgba(66, 133, 244, 0.05);
-            color: var(--google-blue);
-        }
-
-        .tab.active {
-            color: var(--google-blue);
-            background: white;
-            border-bottom: 3px solid var(--google-blue);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* User Info Cards */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .info-card {
-            background: white;
-            padding: 20px;
-            border-radius: var(--radius);
-            border: 1px solid var(--google-gray);
-            transition: var(--transition);
-            border-left: 4px solid var(--google-blue);
-        }
-
-        .info-card:hover {
-            border-color: var(--google-blue);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .info-label {
-            font-size: 0.85rem;
-            color: var(--google-text-light);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .info-value {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--google-dark);
-        }
-
-        .credit-display {
-            font-size: 1.5rem;
-            color: var(--google-blue);
-            font-weight: 700;
-        }
-
-        /* Online Time Display */
-        .online-time-card {
-            background: linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(52, 168, 83, 0.1));
-            border: 2px solid var(--google-blue);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .time-label {
-            font-size: 0.9rem;
-            color: var(--google-text-light);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .time-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--google-blue);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 8px;
-        }
-
-        .time-details {
-            font-size: 0.9rem;
-            color: var(--google-text-light);
-        }
-
-        /* Table Styles */
-        .data-table {
+            transform: translateY(20px);
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
         }
+        .crt-box::after { content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; }
+        .crt-text { font-family: var(--font-mono); font-size: 24px; font-weight: 700; color: var(--md-sys-color-success); text-shadow: 0 0 5px var(--md-sys-color-success); letter-spacing: 2px; position: relative; z-index: 3; }
+        .crt-scanline { width: 100%; height: 5px; background: rgba(109,213,140,0.5); position: absolute; top: 0; left: 0; z-index: 4; animation: scanline 3s linear infinite; opacity: 0.5; }
+        
+        .seq-4 .crt-box { animation: fadeUpCode 0.5s ease forwards 0.8s; }
+        .seq-4 .email-instruction { animation: fadeUpCode 0.5s ease forwards 1s; opacity: 0; transform: translateY(10px); }
 
-        .data-table th {
-            background: var(--google-gray-light);
-            padding: 16px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--google-text);
-            border-bottom: 2px solid var(--google-gray);
-        }
+        @keyframes fadeInTickArea { 0% { opacity: 0; } 100% { opacity: 1; } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.5); } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shootRight { 0% { left: -100%; } 100% { left: 100%; } }
+        @keyframes shootLeft { 0% { left: 100%; } 100% { left: -100%; } }
+        @keyframes scanline { 0% { top: -10%; } 100% { top: 110%; } }
+        @keyframes gpaySplashIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes drawTick { 0% { stroke-dashoffset: 100; } 100% { stroke-dashoffset: 0; } }
+        @keyframes fadeUpCode { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes rippleSplash { 0% { transform: scale(1); opacity: 1; border-width: 10px; } 100% { transform: scale(1.6); opacity: 0; border-width: 0; } }
 
-        .data-table td {
-            padding: 16px;
-            border-bottom: 1px solid var(--google-gray);
-        }
+        .spinner { border: 3px solid rgba(255,255,255,0.1); border-radius: 50%; border-top-color: var(--md-sys-color-primary); width: 24px; height: 24px; animation: spin 1s linear infinite; display: none; }
+        .btn.loading .spinner { display: inline-block; } .btn.loading .btn-text { display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .data-table tr:hover {
-            background: rgba(66, 133, 244, 0.02);
-        }
-
-        .balance-cell {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .balance-high { color: var(--google-green); }
-        .balance-medium { color: var(--google-yellow); }
-        .balance-low { color: var(--google-red); }
-
-        /* Status Badges */
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-active {
-            background: rgba(52, 168, 83, 0.1);
-            color: var(--google-green);
-            border: 1px solid rgba(52, 168, 83, 0.3);
-        }
-
-        .status-inactive {
-            background: rgba(234, 67, 53, 0.1);
-            color: var(--google-red);
-            border: 1px solid rgba(234, 67, 53, 0.3);
-        }
-
-        .status-banned {
-            background: rgba(139, 92, 246, 0.1);
-            color: #8B5CF6;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-
-        .status-pending {
-            background: rgba(251, 188, 5, 0.1);
-            color: var(--google-yellow);
-            border: 1px solid rgba(251, 188, 5, 0.3);
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .btn-icon {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Approval Items */
-        .approval-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .approval-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px;
-            background: white;
-            border-radius: var(--radius);
-            border: 1px solid var(--google-gray);
-            transition: var(--transition);
-        }
-
-        .approval-item:hover {
-            border-color: var(--google-blue);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .approval-info {
-            flex: 1;
-        }
-
-        .approval-amount {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--google-dark);
-            margin-bottom: 4px;
-        }
-
-        .approval-time {
-            font-size: 0.9rem;
-            color: var(--google-text-light);
-        }
-
-        .approval-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-left: 10px;
-        }
-
-        .badge-common {
-            background: rgba(66, 133, 244, 0.1);
-            color: var(--google-blue);
-            border: 1px solid rgba(66, 133, 244, 0.3);
-        }
-
-        .badge-rare {
-            background: rgba(251, 188, 5, 0.1);
-            color: var(--google-yellow);
-            border: 1px solid rgba(251, 188, 5, 0.3);
-        }
-
-        .badge-very-rare {
-            background: rgba(234, 67, 53, 0.1);
-            color: var(--google-red);
-            border: 1px solid rgba(234, 67, 53, 0.3);
-        }
-
-        /* Analytics Cards */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .analytics-card {
-            background: white;
-            padding: 20px;
-            border-radius: var(--radius);
-            border: 1px solid var(--google-gray);
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .analytics-card:hover {
-            border-color: var(--google-blue);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--google-text-light);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--google-blue);
-            margin-bottom: 4px;
-        }
-
-        .stat-subvalue {
-            font-size: 0.85rem;
-            color: var(--google-text-light);
-        }
-
-        /* Statement Items */
-        .statement-container {
-            background: white;
-            border-radius: var(--radius);
-            padding: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--google-gray);
-        }
-
-        .statement-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 16px;
-            border-bottom: 1px solid var(--google-gray);
-        }
-
-        .statement-item:last-child {
-            border-bottom: none;
-        }
-
-        .statement-amount {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .statement-credit { color: var(--google-green); }
-        .statement-debit { color: var(--google-red); }
-
-        .statement-time {
-            font-size: 0.85rem;
-            color: var(--google-text-light);
-            margin-top: 4px;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 500px;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-
-        .modal-header {
-            padding: 24px;
-            background: var(--google-gray-light);
-            border-bottom: 1px solid var(--google-gray);
-        }
-
-        .modal-header h3 {
-            color: var(--google-dark);
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-body {
-            padding: 24px;
-        }
-
-        .modal-footer {
-            padding: 20px 24px;
-            background: var(--google-gray-light);
-            border-top: 1px solid var(--google-gray);
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-        }
-
-        /* Admin Key Modal */
-        .admin-key-input {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid var(--google-gray);
-            border-radius: var(--radius-sm);
-            font-size: 24px;
-            text-align: center;
-            letter-spacing: 8px;
-            font-weight: 600;
-            color: var(--google-dark);
-            transition: var(--transition);
-        }
-
-        .admin-key-input:focus {
-            outline: none;
-            border-color: var(--google-blue);
-            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
-        }
-
-        /* Warning Boxes */
-        .warning-box {
-            padding: 16px;
-            border-radius: var(--radius);
-            margin: 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .warning-danger {
-            background: rgba(234, 67, 53, 0.1);
-            border: 1px solid rgba(234, 67, 53, 0.3);
-            color: var(--google-red);
-        }
-
-        .warning-warning {
-            background: rgba(251, 188, 5, 0.1);
-            border: 1px solid rgba(251, 188, 5, 0.3);
-            color: var(--google-yellow);
-        }
-
-        .warning-info {
-            background: rgba(66, 133, 244, 0.1);
-            border: 1px solid rgba(66, 133, 244, 0.3);
-            color: var(--google-blue);
-        }
-
-        /* Empty States */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--google-text-light);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--google-dark);
-            color: white;
-            padding: 16px 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            max-width: 400px;
-            animation: slideInRight 0.3s ease;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .notification-success {
-            border-left: 4px solid var(--google-green);
-        }
-
-        .notification-error {
-            border-left: 4px solid var(--google-red);
-        }
-
-        .notification-info {
-            border-left: 4px solid var(--google-blue);
-        }
-
-        /* Responsive Design */
+        /* ==========================================================================
+           UPDATED MOBILE MEDIA QUERY
+           ========================================================================== */
         @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-            
-            .logo {
-                font-size: 2.5rem;
+            .auth-wrapper { 
                 flex-direction: column;
-                gap: 5px;
+                justify-content: flex-start;
+                padding: 24px 0 0 0;
+                min-height: 100vh;
+                overflow-y: auto; /* Added mobile scroll */
             }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .btn {
+            .auth-card { 
+                padding: 32px 24px; 
+                border-radius: var(--radius-xl); 
+                border-bottom-left-radius: 0; 
+                border-bottom-right-radius: 0; 
+                position: relative; /* Removed absolute to allow smooth scrolling */
+                margin-top: auto;   /* Naturally pushes card to bottom */
+                max-width: 100%;
                 width: 100%;
+                zoom: 0.85; /* Exactly 15% zoom out for sign-in card */
             }
-            
-            .tabs {
-                overflow-x: auto;
-                padding-bottom: 10px;
-            }
-            
-            .approval-item {
-                flex-direction: column;
-                gap: 16px;
-                align-items: stretch;
-            }
-            
-            .data-table {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10px;
-            }
+            .rc-actions { grid-template-columns: 1fr; }
+            .modal-surface { margin: 16px; max-height: calc(100vh - 32px); border-radius: var(--radius-xl); }
+            .data-table-wrapper { border-radius: 0; border-left: none; border-right: none; margin: 0 -24px; }
+            .crt-text { font-size: 20px; }
         }
-
-        @media (max-width: 480px) {
-            .card {
-                padding: 16px;
-            }
-            
-            .card-title {
-                font-size: 1.3rem;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .analytics-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Utility Classes */
-        .text-center { text-align: center; }
-        .text-muted { color: var(--google-text-light); }
-        .mt-1 { margin-top: 8px; }
-        .mt-2 { margin-top: 16px; }
-        .mt-3 { margin-top: 24px; }
-        .mb-1 { margin-bottom: 8px; }
-        .mb-2 { margin-bottom: 16px; }
-        .mb-3 { margin-bottom: 24px; }
-        .hidden { display: none; }
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-2 { gap: 8px; }
-        .gap-3 { gap: 12px; }
-        .w-full { width: 100%; }
     </style>
 </head>
 <body>
-    <!-- Admin Key Verification Modal -->
-    <div class="modal" id="adminKeyModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-shield-alt"></i> Security Verification</h3>
-            </div>
-            <div class="modal-body">
-                <div class="warning-box warning-info">
-                    <i class="fas fa-lock"></i>
-                    <div>Please enter the admin key to continue</div>
-                </div>
-                <input type="password" id="adminKeyInput" class="admin-key-input" placeholder="____" maxlength="4">
-                <div id="keyError" class="warning-box warning-danger hidden mt-2">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>Invalid admin key. Please try again.</div>
-                </div>
-                <div id="attemptsWarning" class="text-muted text-center mt-2">
-                    Attempts remaining: <span id="attemptsCount" class="font-bold">3</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="verifyKeyBtn" class="btn btn-primary w-full">
-                    <i class="fas fa-check"></i> Verify & Continue
-                </button>
-            </div>
-        </div>
-    </div>
+    <div class="ambient-bg"><div class="ambient-glow glow-1"></div><div class="ambient-glow glow-2"></div></div>
 
-    <div class="container" id="mainContent" class="hidden">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <span class="google-colors">Google Playcode</span>
-                <i class="fas fa-database" style="color: #4285F4;"></i>
-            </div>
-            <div class="tagline">Advanced Data Management System - Load and manage your Playcode data files</div>
-        </div>
+    <div id="page-auth" class="page" style="display: block;">
+        <div class="auth-wrapper">
+            <div class="auth-card">
+                <div class="auth-header-wrapper">
+                    <div class="auth-logo-container">
+                        <div class="gp-logo" style="width: 64px; height: 64px; border-radius: 16px;"><div class="gp-triangle" style="border-left-width: 20px; border-top-width: 14px; border-bottom-width: 14px; margin-left: 8px;"></div></div>
+                    </div>
+                    <h1 class="auth-title">Sign in</h1>
+                    <p class="text-muted">to continue to PlayCode Rewards+</p>
+                </div>
+                
+                <form id="loginForm" onsubmit="event.preventDefault(); handleStandardLogin();">
+                    <div class="form-group">
+                        <label class="form-label">Account Number</label>
+                        <input type="text" id="inpAccNo" class="form-control" placeholder="Enter your 10-digit account number" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">SAR Number</label>
+                        <input type="password" id="inpSarNo" class="form-control" placeholder="Enter your SAR number" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="btnSignIn" style="margin-top: 32px;">
+                        <span class="btn-text">Sign In</span><div class="spinner"></div>
+                    </button>
+                </form>
 
-        <!-- File Management Card -->
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-file-upload"></i> Load & Save Data File</h2>
-            <div class="btn-group">
-                <label class="btn btn-secondary btn-file">
-                    <i class="fas fa-folder-open"></i> Choose JSON File
-                    <input type="file" id="jsonFileInput" accept=".json">
-                </label>
-                <button id="loadDataBtn" class="btn btn-primary">
-                    <i class="fas fa-upload"></i> Load Data
-                </button>
-                <button id="saveDataBtn" class="btn btn-success">
-                    <i class="fas fa-save"></i> Save All Data
-                </button>
-                <button id="editCreditBtn" class="btn btn-purple">
-                    <i class="fas fa-edit"></i> Edit Credit
-                </button>
-                <button id="clearAllBtn" class="btn btn-danger">
-                    <i class="fas fa-trash-alt"></i> Clear All Data
-                </button>
-            </div>
-            <div id="fileInfo" class="text-muted mt-3 text-center"></div>
-        </div>
-
-        <!-- Data Display Area -->
-        <div id="dataDisplay" class="hidden">
-            <!-- Tabs -->
-            <div class="tabs-container">
-                <div class="tabs" id="tabs">
-                    <button class="tab active" data-tab="userInfo">
-                        <i class="fas fa-user-circle"></i> User Info
-                    </button>
-                    <button class="tab" data-tab="members">
-                        <i class="fas fa-users"></i> Members Data
-                    </button>
-                    <button class="tab" data-tab="approvals">
-                        <i class="fas fa-check-circle"></i> Approvals
-                    </button>
-                    <button class="tab" data-tab="analytics">
-                        <i class="fas fa-chart-line"></i> Analytics
+                <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 24px;">
+                    <button class="btn btn-secondary btn-block" onclick="openModal('modal-direct-signin')">Quick Sign In</button>
+                    <button class="btn" style="background: transparent; color: var(--md-sys-color-outline);" onclick="openModal('modal-admin-auth')">
+                        <span class="material-icons-round" style="font-size: 18px;">admin_panel_settings</span> Admin Access
                     </button>
                 </div>
             </div>
-
-            <!-- User Information Tab -->
-            <div class="tab-content active" id="userInfoTab">
-                <div class="card">
-                    <h2 class="card-title"><i class="fas fa-user-circle"></i> User Account Information</h2>
-                    
-                    <!-- Online Time Display -->
-                    <div class="online-time-card" id="onlineTimeDisplay">
-                        <div class="time-label">TOTAL ONLINE TIME</div>
-                        <div class="time-value" id="totalOnlineTime">0h 0m</div>
-                        <div class="time-details" id="onlineTimeDetails">Calculating session data...</div>
-                    </div>
-                    
-                    <div class="info-grid">
-                        <div class="info-card">
-                            <div class="info-label">
-                                <i class="fas fa-user"></i> User ID
-                            </div>
-                            <div class="info-value" id="displayUserId">-</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">
-                                <i class="fas fa-key"></i> Password
-                            </div>
-                            <div class="info-value" id="displayPassword">-</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">
-                                <i class="fas fa-wallet"></i> Current Credit
-                            </div>
-                            <div class="info-value">
-                                <span class="credit-display" id="displayCredit">-</span>
-                            </div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">
-                                <i class="fas fa-users"></i> Total Members
-                            </div>
-                            <div class="info-value" id="displayMemberCount">-</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">
-                                <i class="fas fa-check-circle"></i> Approval Codes
-                            </div>
-                            <div class="info-value" id="displayApprovalCount">-</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">
-                                <i class="fas fa-calendar-alt"></i> Account Created
-                            </div>
-                            <div class="info-value" id="displayCreatedDate">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Members Data Tab -->
-            <div class="tab-content" id="membersTab">
-                <div class="card">
-                    <h2 class="card-title"><i class="fas fa-users"></i> Members Management</h2>
-                    <div class="btn-group">
-                        <button id="exportMembersBtn" class="btn btn-success">
-                            <i class="fas fa-file-export"></i> Export Members Data
-                        </button>
-                        <button id="clearMembersBtn" class="btn btn-danger">
-                            <i class="fas fa-trash-alt"></i> Clear All Members
-                        </button>
-                        <button id="activateAllBtn" class="btn btn-success">
-                            <i class="fas fa-check-circle"></i> Activate All Members
-                        </button>
-                    </div>
-                    
-                    <div class="mt-3">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Account No</th>
-                                    <th>SAR No</th>
-                                    <th>Balance</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="membersTableBody">
-                                <!-- Members data will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Approvals Tab -->
-            <div class="tab-content" id="approvalsTab">
-                <div class="card">
-                    <h2 class="card-title"><i class="fas fa-check-circle"></i> Approval Codes Management</h2>
-                    <div class="btn-group">
-                        <button id="exportApprovalsBtn" class="btn btn-success">
-                            <i class="fas fa-file-export"></i> Export Approvals Data
-                        </button>
-                        <button id="clearApprovalsBtn" class="btn btn-danger">
-                            <i class="fas fa-trash-alt"></i> Clear All Approvals
-                        </button>
-                        <button id="showApprovedOnlyBtn" class="btn btn-secondary">
-                            <i class="fas fa-check"></i> Approved Only
-                        </button>
-                        <button id="showPendingOnlyBtn" class="btn btn-secondary">
-                            <i class="fas fa-clock"></i> Pending Only
-                        </button>
-                        <button id="showAllApprovalsBtn" class="btn btn-primary">
-                            <i class="fas fa-list"></i> Show All
-                        </button>
-                    </div>
-                    
-                    <div class="approval-list mt-3" id="approvalsList">
-                        <!-- Approval items will be populated here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analytics Tab -->
-            <div class="tab-content" id="analyticsTab">
-                <div class="card">
-                    <h2 class="card-title"><i class="fas fa-chart-line"></i> Session Analytics</h2>
-                    
-                    <div class="btn-group">
-                        <button id="exportAnalyticsBtn" class="btn btn-success">
-                            <i class="fas fa-file-export"></i> Export Analytics Data
-                        </button>
-                        <button id="clearAnalyticsBtn" class="btn btn-danger">
-                            <i class="fas fa-trash-alt"></i> Clear Analytics
-                        </button>
-                    </div>
-                    
-                    <div class="analytics-grid mt-3">
-                        <div class="analytics-card">
-                            <div class="stat-label">TOTAL ONLINE TIME</div>
-                            <div class="stat-value" id="analyticsTotalTime">0h 0m</div>
-                            <div class="stat-subvalue" id="analyticsTimeDetails">All sessions combined</div>
-                        </div>
-                        <div class="analytics-card">
-                            <div class="stat-label">APPROVALS PROCESSED</div>
-                            <div class="stat-value" id="totalApprovals">0</div>
-                            <div class="stat-subvalue">Approved + Rejected</div>
-                        </div>
-                        <div class="analytics-card">
-                            <div class="stat-label">CREDIT PROCESSED</div>
-                            <div class="stat-value" id="totalCreditProcessed">0</div>
-                            <div class="stat-subvalue">Total credit in approvals</div>
-                        </div>
-                        <div class="analytics-card">
-                            <div class="stat-label">AVG. REQUEST SIZE</div>
-                            <div class="stat-value" id="avgRequestSize">0</div>
-                            <div class="stat-subvalue">Average credit per request</div>
-                        </div>
-                    </div>
-
-                    <h3 class="card-title mt-3"><i class="fas fa-history"></i> Recent Activity</h3>
-                    <div class="statement-container" id="sessionHistory">
-                        <!-- Session history will be populated here -->
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Member Action Modal -->
-    <div class="modal" id="actionModal">
-        <div class="modal-content">
+    <div id="page-dashboard" class="page">
+        <header class="top-app-bar">
+            <div class="bar-content">
+                <div class="brand">
+                    <div class="brand-logo gp-logo"><div class="gp-triangle"></div></div>
+                    PlayCode <span style="font-weight: 400; color: var(--md-sys-color-on-surface-variant);">Rewards+</span>
+                </div>
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <button class="btn btn-icon" style="color: var(--md-sys-color-outline);" onclick="logout()"><span class="material-icons-round">logout</span></button>
+                    <div class="user-profile-btn" id="navAvatar">U</div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="section-header">
+                <h2 class="section-title">My Rewards <span class="material-icons-round text-primary">auto_awesome</span></h2>
+            </div>
+            <div class="rewards-grid" id="userRewardsGrid"></div>
+        </main>
+    </div>
+
+    <div id="page-admin" class="page">
+        <header class="top-app-bar">
+            <div class="bar-content">
+                <div class="brand">
+                    <div class="brand-logo gp-logo"><div class="gp-triangle"></div></div>
+                    Admin <span style="font-weight: 400; color: var(--md-sys-color-error);">Console</span>
+                </div>
+                <button class="btn btn-secondary" onclick="logout()">Exit Admin</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="section-header">
+                <h2 class="section-title">Reward Management</h2>
+                <button class="btn btn-primary" onclick="openIssueRewardModal()"><span class="material-icons-round">add</span> Issue Reward</button>
+            </div>
+            
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead><tr><th>Reward Name</th><th>Issued To</th><th>Expires On</th><th>Status</th></tr></thead>
+                    <tbody id="adminRewardsTable"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-direct-signin" class="modal-backdrop">
+        <div class="modal-surface">
             <div class="modal-header">
-                <h3><i class="fas fa-user-edit"></i> Member Action</h3>
+                <h2 class="modal-title">Direct Sign In</h2>
+                <button class="btn btn-icon" style="color: var(--md-sys-color-on-surface-variant);" onclick="closeModal('modal-direct-signin')"><span class="material-icons-round">close</span></button>
             </div>
             <div class="modal-body">
-                <div class="text-center mb-3">
-                    <div class="text-muted mb-2">What action do you want to perform on member</div>
-                    <div class="info-value" id="modalMemberName">-</div>
+                <p class="text-muted" style="margin-bottom: 24px;">Enter your direct sign-in key (first 4 letters of name lowercase + last 2 digits of SAR)</p>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Direct Key</label>
+                    <input type="text" id="inpDirectKey" class="form-control" placeholder="e.g., john12">
                 </div>
+                <div class="info-box">Example: If your name is "John Doe" and SAR is "12345", enter: <span class="text-success font-mono">john45</span></div>
             </div>
             <div class="modal-footer">
-                <button id="deactivateBtn" class="btn btn-warning">
-                    <i class="fas fa-user-slash"></i> Deactivate
+                <button class="btn btn-secondary" style="border:none;" onclick="closeModal('modal-direct-signin')">Cancel</button>
+                <button class="btn btn-primary" id="btnDirectSignIn" onclick="handleDirectSignIn()">
+                    <span class="btn-text">Sign In Directly</span><div class="spinner"></div>
                 </button>
-                <button id="banBtn" class="btn btn-danger">
-                    <i class="fas fa-ban"></i> Ban
-                </button>
-                <button id="cancelActionBtn" class="btn btn-secondary">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- Edit Credit Modal -->
-    <div class="modal" id="editCreditModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-edit"></i> Edit Credit Balance</h3>
+    <div id="modal-admin-auth" class="modal-backdrop">
+        <div class="modal-surface" style="max-width: 400px;">
+            <div class="modal-header"><h2 class="modal-title">Admin Identity</h2><button class="btn btn-icon" onclick="closeModal('modal-admin-auth')"><span class="material-icons-round">close</span></button></div>
+            <div class="modal-body"><div class="form-group mb-0"><label class="form-label">Admin Email</label><input type="email" id="inpAdminEmail" class="form-control" placeholder="admin@playcode.com"></div></div>
+            <div class="modal-footer"><button class="btn btn-primary btn-block" onclick="verifyAdminEmail()">Continue</button></div>
+        </div>
+    </div>
+    
+    <div id="modal-admin-pin" class="modal-backdrop">
+        <div class="modal-surface" style="max-width: 400px;">
+            <div class="modal-header"><h2 class="modal-title">Security PIN</h2><button class="btn btn-icon" onclick="closeModal('modal-admin-pin')"><span class="material-icons-round">close</span></button></div>
+            <div class="modal-body"><div class="form-group mb-0"><label class="form-label">4-Digit PIN</label><input type="password" id="inpAdminPin" class="form-control font-mono" placeholder="••••" maxlength="4" style="letter-spacing: 4px; text-align: center; font-size: 24px;"></div></div>
+            <div class="modal-footer"><button class="btn btn-primary btn-block" onclick="verifyAdminPin()">Unlock Console</button></div>
+        </div>
+    </div>
+
+    <div id="modal-transfer" class="modal-backdrop">
+        <div class="modal-surface">
+            <div class="modal-header"><h2 class="modal-title">Transfer Reward</h2><button class="btn btn-icon" onclick="closeModal('modal-transfer')"><span class="material-icons-round">close</span></button></div>
+            <div class="modal-body" style="padding-top: 16px;">
+                <div class="search-container">
+                    <span class="material-icons-round">search</span>
+                    <input type="text" id="inpUserSearch" class="form-control" placeholder="Search by Name or Account No..." onkeyup="filterTransferUsers()">
+                </div>
+                <div class="user-list" id="transferUserList"></div>
             </div>
+        </div>
+    </div>
+
+    <div id="modal-issue" class="modal-backdrop">
+        <div class="modal-surface">
+            <div class="modal-header"><h2 class="modal-title">Issue New Reward</h2><button class="btn btn-icon" onclick="closeModal('modal-issue')"><span class="material-icons-round">close</span></button></div>
             <div class="modal-body">
-                <div class="info-card text-center mb-3">
-                    <div class="info-label">Current Credit Balance</div>
-                    <div class="credit-display" id="currentCreditAmount">0</div>
-                </div>
-                <input type="number" id="newCreditInput" class="form-input" placeholder="Enter new credit amount" min="0">
-                <div id="editCreditError" class="warning-box warning-danger hidden mt-2">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>Please enter a valid credit amount</div>
-                </div>
+                <div class="form-group"><label class="form-label">Select User</label><select id="selIssueUser" class="form-control" style="appearance: none;"></select></div>
+                <div class="form-group"><label class="form-label">Reward Title</label><input type="text" id="inpIssueTitle" class="form-control" placeholder="e.g., ₹500 Play Code"></div>
+                <div class="form-group mb-0"><label class="form-label">Expiry Date</label><input type="date" id="inpIssueDate" class="form-control"></div>
             </div>
             <div class="modal-footer">
-                <button id="confirmEditCreditBtn" class="btn btn-purple">
-                    <i class="fas fa-check"></i> Update Credit
-                </button>
-                <button id="cancelEditCreditBtn" class="btn btn-secondary">Cancel</button>
+                <button class="btn btn-secondary" onclick="closeModal('modal-issue')">Cancel</button>
+                <button class="btn btn-primary" onclick="submitNewReward()">Issue Now</button>
             </div>
         </div>
     </div>
 
-    <!-- Clear Analytics Modal -->
-    <div class="modal" id="clearAnalyticsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-trash-alt"></i> Clear Session Analytics</h3>
+    <div id="activationOverlay" class="activation-overlay">
+        <div class="anim-stage" id="animStageArea">
+            <div class="anim-node node-playcode" id="nodeL">
+                <div class="gp-logo" style="width: 48px; height: 48px;"><div class="gp-triangle"></div></div>
             </div>
-            <div class="modal-body">
-                <div class="warning-box warning-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div>Are you sure you want to clear all session analytics data?</div>
+            <div class="anim-connector" id="animConnector">
+                <div class="anim-glow-bar"></div>
+            </div>
+            <div class="anim-node node-user" id="nodeR">U</div>
+        </div>
+        
+        <div class="final-tick-container" id="finalTickArea">
+            <div class="success-circle">
+                <svg class="checkmark" viewBox="0 0 52 52">
+                    <path d="M14 27 l10 10 l16 -16" />
+                </svg>
+            </div>
+            <h2 id="tickTitle" style="color: white; font-family: var(--font-display); text-align: center; margin-top: 16px;">Reward Activated</h2>
+            
+            <div id="crtBoxContainer" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 8px;">
+                <div class="crt-box">
+                    <div class="crt-scanline"></div>
+                    <div class="crt-text" id="generatedCrtCode">CRT-XXXXX-PLAYCODE-23XX</div>
                 </div>
-                <div class="text-muted mt-3">
-                    This will reset:
-                    <ul class="mt-2" style="padding-left: 20px;">
-                        <li>Session start time</li>
-                        <li>Statement history</li>
-                        <li>Online time tracking</li>
-                    </ul>
-                    <div class="mt-2"><strong>This action cannot be undone.</strong></div>
+                <div class="email-instruction" style="background: rgba(168, 199, 250, 0.1); color: var(--md-sys-color-primary); padding: 12px 24px; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 8px; font-weight: 500; margin-top: 16px; width: 100%; justify-content: center; text-align: center;">
+                    <span class="material-icons-round">mail</span> Send code to Playcodeagent@gmail.com
                 </div>
             </div>
-            <div class="modal-footer">
-                <button id="confirmClearAnalyticsBtn" class="btn btn-danger">
-                    <i class="fas fa-trash-alt"></i> Clear Analytics
-                </button>
-                <button id="cancelClearAnalyticsBtn" class="btn btn-secondary">Cancel</button>
-            </div>
+
+            <button class="btn btn-primary" style="margin-top: 32px; min-width: 200px;" onclick="closeActivationSequence()">Done</button>
         </div>
     </div>
 
-    <!-- Notification Container -->
-    <div id="notificationContainer"></div>
-
-    <!-- ALL YOUR ORIGINAL JAVASCRIPT CODE GOES HERE -->
     <script>
-        // Admin Keys
-        const ADMIN_KEYS = ["1583", "3773", "0308"];
-        let attemptsLeft = 3;
-        let isVerified = false;
+        const firebaseConfig = {
+            apiKey: "AIzaSyC799pLj50Sg877kdBPTIXkJPRGHr4ZC4s",
+            authDomain: "playcodesetup.firebaseapp.com",
+            databaseURL: "https://playcodesetup-default-rtdb.firebaseio.com",
+            projectId: "playcodesetup",
+            storageBucket: "playcodesetup.firebasestorage.app",
+            messagingSenderId: "548277697840",
+            appId: "1:548277697840:web:df6c2524d22ca93d089cf5"
+        };
         
-        let currentData = null;
-        let currentMemberId = null;
-        
-        // DOM Elements for Admin Key
-        const adminKeyModal = document.getElementById('adminKeyModal');
-        const adminKeyInput = document.getElementById('adminKeyInput');
-        const verifyKeyBtn = document.getElementById('verifyKeyBtn');
-        const keyError = document.getElementById('keyError');
-        const attemptsWarning = document.getElementById('attemptsWarning');
-        const attemptsCount = document.getElementById('attemptsCount');
-        const mainContent = document.getElementById('mainContent');
-        
-        // NEW DOM Elements for Online Time Feature
-        const onlineTimeDisplay = document.getElementById('onlineTimeDisplay');
-        const totalOnlineTime = document.getElementById('totalOnlineTime');
-        const onlineTimeDetails = document.getElementById('onlineTimeDetails');
-        const analyticsTotalTime = document.getElementById('analyticsTotalTime');
-        const analyticsTimeDetails = document.getElementById('analyticsTimeDetails');
-        const totalApprovals = document.getElementById('totalApprovals');
-        const totalCreditProcessed = document.getElementById('totalCreditProcessed');
-        const avgRequestSize = document.getElementById('avgRequestSize');
-        const sessionHistory = document.getElementById('sessionHistory');
-        
-        // NEW: Analytics buttons
-        const exportAnalyticsBtn = document.getElementById('exportAnalyticsBtn');
-        const clearAnalyticsBtn = document.getElementById('clearAnalyticsBtn');
-        const clearAnalyticsModal = document.getElementById('clearAnalyticsModal');
-        const confirmClearAnalyticsBtn = document.getElementById('confirmClearAnalyticsBtn');
-        const cancelClearAnalyticsBtn = document.getElementById('cancelClearAnalyticsBtn');
-        
-        // Admin Key Verification
-        function verifyAdminKey() {
-            const enteredKey = adminKeyInput.value.trim();
-            
-            if (ADMIN_KEYS.includes(enteredKey)) {
-                isVerified = true;
-                adminKeyModal.style.display = 'none';
-                mainContent.style.display = 'block';
-                sessionStorage.setItem('adminVerified', 'true');
-            } else {
-                attemptsLeft--;
-                attemptsCount.textContent = attemptsLeft;
-                keyError.classList.remove('hidden');
-                adminKeyInput.value = '';
-                adminKeyInput.focus();
-                
-                if (attemptsLeft <= 0) {
-                    showNotification('Too many failed attempts. Please refresh the page and try again.');
-                    adminKeyInput.disabled = true;
-                    verifyKeyBtn.disabled = true;
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let currentUser = null;
+        let allUsersCache = [];
+        let rewardToTransferId = null;
+
+        async function fetchAllUsers() {
+            try {
+                const snap = await db.ref('users').once('value');
+                allUsersCache = [];
+                if (snap.exists()) {
+                    snap.forEach(child => { 
+                        let u = child.val();
+                        if(!u.accNo) u.accNo = child.key;
+                        allUsersCache.push(u); 
+                    });
                 }
+            } catch (e) {
+                console.error("Fetch users error:", e);
+                alert("Failed to connect to the database.");
             }
         }
-        
-        // Check if already verified in this session
-        if (sessionStorage.getItem('adminVerified') === 'true') {
-            isVerified = true;
-            adminKeyModal.style.display = 'none';
-            mainContent.style.display = 'block';
-        } else {
-            adminKeyModal.style.display = 'flex';
-            mainContent.style.display = 'none';
-        }
-        
-        // Event Listeners for Admin Key
-        verifyKeyBtn.addEventListener('click', verifyAdminKey);
-        
-        adminKeyInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                verifyAdminKey();
-            }
-        });
-        
-        // Only allow numbers in admin key input
-        adminKeyInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
-        
-        // FIXED: Tab Switching Functionality
-        function initializeTabSwitching() {
-            const tabButtons = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
+
+        async function handleStandardLogin() {
+            const btn = document.getElementById('btnSignIn');
+            btn.classList.add('loading');
             
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.getAttribute('data-tab');
+            const accNo = document.getElementById('inpAccNo').value.trim();
+            const sarNo = document.getElementById('inpSarNo').value.trim();
+
+            try {
+                const snap = await db.ref(`users/${accNo}`).once('value');
+                if (snap.exists()) {
+                    let userData = snap.val();
+                    if(!userData.accNo) userData.accNo = accNo;
                     
-                    // Remove active class from all tabs
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
-                    button.classList.add('active');
-                    
-                    // Show corresponding content
-                    const contentId = tabId + 'Tab';
-                    const contentElement = document.getElementById(contentId);
-                    if (contentElement) {
-                        contentElement.classList.add('active');
-                        
-                        // Load data if needed
-                        if (tabId === 'members' && currentData) {
-                            displayMembersData(currentData.appData.members);
-                        } else if (tabId === 'approvals' && currentData) {
-                            displayApprovalsData(currentData.appData.approvals);
-                        } else if (tabId === 'analytics' && currentData) {
-                            updateOnlineTimeDisplay();
-                            calculateAnalytics();
-                            renderSessionHistory();
-                        }
-                    }
-                });
-            });
-        }
-        
-        // FIXED: Online Time Calculation - Data Manager should NOT increase online time
-        function calculateTotalOnlineTime() {
-            if (!currentData || !currentData.appData || !currentData.appData.meta) {
-                return { totalMinutes: 0, hours: 0, minutes: 0 };
-            }
-            
-            let totalMinutes = 0;
-            
-            // FIXED: Only use stored online time, don't calculate from current time
-            if (currentData.appData.meta.onlineTime && currentData.appData.meta.onlineTime.totalSeconds) {
-                // Use the stored online time from Playcode system
-                totalMinutes = currentData.appData.meta.onlineTime.totalSeconds / 60;
-                
-                // Add current session time if available and system was online
-                if (currentData.appData.meta.onlineTime.currentSessionSeconds) {
-                    totalMinutes += currentData.appData.meta.onlineTime.currentSessionSeconds / 60;
-                }
-            }
-            // Fallback: Calculate from session start time (but don't use current time)
-            else if (currentData.appData.meta.sessionStart) {
-                const sessionStartTime = currentData.appData.meta.sessionStart;
-                // Use the original session start time, don't calculate from current time
-                const sessionEndTime = currentData.appData.meta.lastLogoutTime || sessionStartTime;
-                const sessionMinutes = (sessionEndTime - sessionStartTime) / (1000 * 60);
-                totalMinutes = sessionMinutes;
-            }
-            
-            const hours = Math.floor(totalMinutes / 60);
-            const minutes = Math.floor(totalMinutes % 60);
-            
-            return { totalMinutes, hours, minutes };
-        }
-        
-        function formatTime(hours, minutes) {
-            if (hours > 0) {
-                return `${hours}h ${minutes}m`;
-            } else {
-                return `${minutes}m`;
-            }
-        }
-        
-        function updateOnlineTimeDisplay() {
-            if (!currentData) return;
-            
-            const timeData = calculateTotalOnlineTime();
-            const formattedTime = formatTime(timeData.hours, timeData.minutes);
-            
-            // Update all time displays
-            totalOnlineTime.textContent = formattedTime;
-            analyticsTotalTime.textContent = formattedTime;
-            
-            // Update details with calculation method info
-            let calculationMethod = "Based on stored session data";
-            if (currentData.appData.meta.onlineTime) {
-                calculationMethod = "Based on stored online time";
-            } else if (currentData.appData.meta.sessionStart) {
-                calculationMethod = "Based on session history";
-            }
-            
-            onlineTimeDetails.textContent = `${timeData.hours} hours ${timeData.minutes} minutes • ${calculationMethod}`;
-            
-            const approvalCount = currentData.appData.approvals.length;
-            analyticsTimeDetails.textContent = `${approvalCount} approvals processed`;
-        }
-        
-        function calculateAnalytics() {
-            if (!currentData) return;
-            
-            // Total approvals processed
-            const totalApprovalsCount = currentData.appData.approvals.filter(a => a.processed).length;
-            totalApprovals.textContent = totalApprovalsCount.toLocaleString();
-            
-            // Total credit processed
-            const totalCredit = currentData.appData.approvals.reduce((sum, approval) => sum + approval.amount, 0);
-            totalCreditProcessed.textContent = totalCredit.toLocaleString();
-            
-            // Average request size
-            const avgSize = currentData.appData.approvals.length > 0 ? 
-                Math.round(totalCredit / currentData.appData.approvals.length) : 0;
-            avgRequestSize.textContent = avgSize.toLocaleString();
-        }
-        
-        function renderSessionHistory() {
-            if (!currentData || !currentData.appData) {
-                sessionHistory.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><div>No session history available</div></div>';
-                return;
-            }
-            
-            // Use statementHistory from Playcode data
-            const statementData = currentData.appData.meta.statementHistory || [];
-            const recentStatements = statementData.slice(0, 20).reverse(); // Show latest 20 entries
-            
-            if (recentStatements.length === 0) {
-                sessionHistory.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><div>No recent activity</div></div>';
-                return;
-            }
-            
-            sessionHistory.innerHTML = recentStatements.map(statement => {
-                const date = new Date(statement.time);
-                const amountClass = statement.type.includes('approved') ? 'statement-debit' : 'statement-credit';
-                const amountPrefix = statement.type.includes('approved') ? '-' : '+';
-                
-                return `
-                    <div class="statement-item">
-                        <div>
-                            <div style="font-weight: 500;">
-                                ${getStatementTypeText(statement.type)}
-                                ${statement.status === 'pending' ? '⏳' : statement.status === 'approved' ? '✅' : '❌'}
-                            </div>
-                            <div class="statement-time">${date.toLocaleString()}</div>
-                        </div>
-                        <div class="statement-amount ${amountClass}">
-                            ${amountPrefix}${statement.amount.toLocaleString()}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function getStatementTypeText(type) {
-            const types = {
-                'approval_request': 'Approval Request',
-                'approval_approved': 'Approval Deducted', 
-                'approval_rejected': 'Approval Rejected',
-                'credit_edit': 'Credit Edited'
-            };
-            return types[type] || type;
-        }
-        
-        // NEW: Clear Analytics Function
-        function clearSessionAnalytics() {
-            if (!currentData || !currentData.appData) return;
-            
-            // Reset session analytics data
-            currentData.appData.meta.sessionStart = Date.now();
-            currentData.appData.meta.statementHistory = [];
-            
-            // Reset online time tracking
-            if (currentData.appData.meta.onlineTime) {
-                currentData.appData.meta.onlineTime.totalSeconds = 0;
-                currentData.appData.meta.onlineTime.currentSessionStart = null;
-                currentData.appData.meta.onlineTime.currentSessionSeconds = 0;
-            }
-            
-            currentData.appData.meta.lastLogoutTime = null;
-            
-            // Update display
-            updateOnlineTimeDisplay();
-            calculateAnalytics();
-            renderSessionHistory();
-            
-            showNotification('Session analytics data cleared successfully!');
-        }
-        
-        // NEW: Export Analytics Function
-        function exportAnalyticsData() {
-            if (!currentData) {
-                showNotification('No data loaded to export');
-                return;
-            }
-            
-            const analyticsData = {
-                userInfo: currentData.userInfo,
-                analytics: {
-                    totalOnlineTime: calculateTotalOnlineTime(),
-                    totalApprovals: currentData.appData.approvals.length,
-                    processedApprovals: currentData.appData.approvals.filter(a => a.processed).length,
-                    totalCreditProcessed: currentData.appData.approvals.reduce((sum, a) => sum + a.amount, 0),
-                    statementHistory: currentData.appData.meta.statementHistory || []
-                },
-                exportDate: new Date().toISOString()
-            };
-            
-            downloadJSON(analyticsData, `${currentData.userInfo.id}_analytics_export.json`);
-        }
-        
-        // Modified displayData function to include online time
-        function displayData(data) {
-            dataDisplay.classList.remove('hidden');
-            
-            // Display User Information
-            displayUserId.textContent = data.userInfo.id;
-            displayPassword.textContent = data.userInfo.pass;
-            displayCredit.textContent = data.appData.credit.toLocaleString();
-            displayMemberCount.textContent = data.appData.members.length;
-            displayApprovalCount.textContent = data.appData.approvals.length;
-            
-            const createdDate = data.appData.meta?.created ? 
-                new Date(data.appData.meta.created).toLocaleDateString() : 'Unknown';
-            displayCreatedDate.textContent = createdDate;
-            
-            // NEW: Update online time display
-            updateOnlineTimeDisplay();
-            calculateAnalytics();
-            renderSessionHistory();
-            
-            // Display other data
-            displayMembersData(data.appData.members);
-            displayApprovalsData(data.appData.approvals);
-        }
-        
-        // Initialize tab switching
-        initializeTabSwitching();
-        
-        // Edit Credit Modal Elements
-        const editCreditModal = document.getElementById('editCreditModal');
-        const editCreditBtn = document.getElementById('editCreditBtn');
-        const currentCreditAmount = document.getElementById('currentCreditAmount');
-        const newCreditInput = document.getElementById('newCreditInput');
-        const confirmEditCreditBtn = document.getElementById('confirmEditCreditBtn');
-        const cancelEditCreditBtn = document.getElementById('cancelEditCreditBtn');
-        const editCreditError = document.getElementById('editCreditError');
-        
-        // Edit Credit Functions
-        function openEditCreditModal() {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            if (!currentData) {
-                showNotification('Please load data first');
-                return;
-            }
-            
-            currentCreditAmount.textContent = currentData.appData.credit.toLocaleString();
-            newCreditInput.value = currentData.appData.credit;
-            editCreditError.classList.add('hidden');
-            editCreditModal.style.display = 'flex';
-            newCreditInput.focus();
-        }
-        
-        function updateCredit() {
-            const newCredit = parseInt(newCreditInput.value);
-            
-            if (isNaN(newCredit) || newCredit < 0) {
-                editCreditError.textContent = 'Please enter a valid credit amount';
-                editCreditError.classList.remove('hidden');
-                return;
-            }
-            
-            currentData.appData.credit = newCredit;
-            displayCredit.textContent = newCredit.toLocaleString();
-            editCreditModal.style.display = 'none';
-            showNotification(`Credit updated to ${newCredit.toLocaleString()} successfully!`);
-        }
-        
-        // Event Listeners for Edit Credit
-        editCreditBtn.addEventListener('click', openEditCreditModal);
-        
-        confirmEditCreditBtn.addEventListener('click', updateCredit);
-        
-        cancelEditCreditBtn.addEventListener('click', () => {
-            editCreditModal.style.display = 'none';
-        });
-        
-        newCreditInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                updateCredit();
-            }
-        });
-        
-        // Only allow numbers in credit input
-        newCreditInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
-        
-        // NEW: Analytics Event Listeners
-        exportAnalyticsBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            exportAnalyticsData();
-        });
-        
-        clearAnalyticsBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            clearAnalyticsModal.style.display = 'flex';
-        });
-        
-        confirmClearAnalyticsBtn.addEventListener('click', () => {
-            clearSessionAnalytics();
-            clearAnalyticsModal.style.display = 'none';
-        });
-        
-        cancelClearAnalyticsBtn.addEventListener('click', () => {
-            clearAnalyticsModal.style.display = 'none';
-        });
-        
-        // DOM Elements
-        const jsonFileInput = document.getElementById('jsonFileInput');
-        const loadDataBtn = document.getElementById('loadDataBtn');
-        const saveDataBtn = document.getElementById('saveDataBtn');
-        const clearAllBtn = document.getElementById('clearAllBtn');
-        const fileInfo = document.getElementById('fileInfo');
-        const dataDisplay = document.getElementById('dataDisplay');
-        
-        // User Info Elements
-        const displayUserId = document.getElementById('displayUserId');
-        const displayPassword = document.getElementById('displayPassword');
-        const displayCredit = document.getElementById('displayCredit');
-        const displayMemberCount = document.getElementById('displayMemberCount');
-        const displayApprovalCount = document.getElementById('displayApprovalCount');
-        const displayCreatedDate = document.getElementById('displayCreatedDate');
-        
-        // Members Tab Elements
-        const membersTableBody = document.getElementById('membersTableBody');
-        const exportMembersBtn = document.getElementById('exportMembersBtn');
-        const clearMembersBtn = document.getElementById('clearMembersBtn');
-        const activateAllBtn = document.getElementById('activateAllBtn');
-        
-        // Approvals Tab Elements
-        const approvalsList = document.getElementById('approvalsList');
-        const exportApprovalsBtn = document.getElementById('exportApprovalsBtn');
-        const clearApprovalsBtn = document.getElementById('clearApprovalsBtn');
-        const showApprovedOnlyBtn = document.getElementById('showApprovedOnlyBtn');
-        const showPendingOnlyBtn = document.getElementById('showPendingOnlyBtn');
-        const showAllApprovalsBtn = document.getElementById('showAllApprovalsBtn');
-        
-        // Action Modal Elements
-        const actionModal = document.getElementById('actionModal');
-        const modalMemberName = document.getElementById('modalMemberName');
-        const deactivateBtn = document.getElementById('deactivateBtn');
-        const banBtn = document.getElementById('banBtn');
-        const cancelActionBtn = document.getElementById('cancelActionBtn');
-        
-        // Load Data Function
-        loadDataBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            const file = jsonFileInput.files[0];
-            if (!file) {
-                showNotification('Please select a JSON file first');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const parsedData = JSON.parse(e.target.result);
-                    currentData = parsedData;
-                    
-                    if (validateData(parsedData)) {
-                        displayData(parsedData);
-                        fileInfo.textContent = `File loaded: ${file.name} (${new Date().toLocaleString()})`;
-                        fileInfo.style.color = 'var(--google-green)';
+                    if (userData.sarNo === sarNo) {
+                        initUserSession(userData);
                     } else {
-                        showNotification('Invalid data format. Please select a valid Playcode JSON file.');
+                        alert("Invalid SAR Number");
                     }
-                } catch (error) {
-                    showNotification('Error reading file: ' + error.message);
+                } else {
+                    alert("Account Number not found");
                 }
-            };
-            reader.readAsText(file);
-        });
-        
-        // Save All Data Function
-        saveDataBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
+            } catch(e) { 
+                console.error(e);
+                alert("Error connecting to server"); 
             }
-            
-            if (!currentData) {
-                showNotification('No data loaded to save');
-                return;
-            }
-            
-            const updatedData = {
-                ...currentData,
-                exportDate: new Date().toISOString(),
-                exportedBy: 'Data Manager'
-            };
-            
-            downloadJSON(updatedData, `${currentData.userInfo.id}_complete_data_${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
-            fileInfo.textContent = `Data saved successfully! (${new Date().toLocaleString()})`;
-            fileInfo.style.color = 'var(--google-green)';
-        });
-        
-        // Validate Data Format
-        function validateData(data) {
-            return data && 
-                   data.userInfo && 
-                   data.userInfo.id && 
-                   data.appData && 
-                   Array.isArray(data.appData.members) && 
-                   Array.isArray(data.appData.approvals);
+            btn.classList.remove('loading');
         }
-        
-        // Display Members Data in Table
-        function displayMembersData(members) {
-            membersTableBody.innerHTML = '';
+
+        async function handleDirectSignIn() {
+            const btn = document.getElementById('btnDirectSignIn');
+            btn.classList.add('loading');
             
-            if (members.length === 0) {
-                membersTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="empty-state">
-                            <i class="fas fa-users-slash"></i>
-                            <div>No members found</div>
-                        </td>
-                    </tr>
-                `;
+            const key = document.getElementById('inpDirectKey').value.trim().toLowerCase();
+            if(key.length < 6) {
+                alert("Invalid Key format");
+                btn.classList.remove('loading');
                 return;
             }
             
-            members.forEach(member => {
-                const row = document.createElement('tr');
-                
-                const balanceClass = getBalanceStatus(member.balance);
-                const statusClass = `status-${member.status}`;
-                const statusText = member.status.charAt(0).toUpperCase() + member.status.slice(1);
-                
-                row.innerHTML = `
-                    <td>${escapeHtml(member.name)}</td>
-                    <td>${escapeHtml(member.account)}</td>
-                    <td>${escapeHtml(member.sar)}</td>
-                    <td class="balance-cell ${balanceClass}">${member.balance.toLocaleString()}</td>
-                    <td>
-                        <span class="status-badge ${statusClass}">
-                            ${member.status === 'active' ? '✓' : member.status === 'banned' ? '⛔' : '✗'}
-                            ${statusText}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-buttons">
-                            ${member.status === 'active' ? 
-                                `<button class="btn btn-warning btn-icon" data-id="${member.id}" title="Deactivate/Ban">
-                                    <i class="fas fa-user-slash"></i>
-                                </button>` :
-                                `<button class="btn btn-success btn-icon" data-id="${member.id}" title="Activate">
-                                    <i class="fas fa-user-check"></i>
-                                </button>`
-                            }
-                        </div>
-                    </td>
-                `;
-                
-                membersTableBody.appendChild(row);
-            });
-            
-            document.querySelectorAll('.btn-warning.btn-icon[data-id]').forEach(btn => {
-                btn.addEventListener('click', () => openActionModal(btn.dataset.id));
-            });
-            
-            document.querySelectorAll('.btn-success.btn-icon[data-id]').forEach(btn => {
-                btn.addEventListener('click', () => activateMember(btn.dataset.id));
-            });
-        }
-        
-        // Open Action Modal for Deactivate/Ban
-        function openActionModal(memberId) {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            const member = currentData.appData.members.find(m => m.id === memberId);
-            if (!member) return;
-            
-            currentMemberId = memberId;
-            modalMemberName.textContent = member.name;
-            actionModal.style.display = 'flex';
-        }
-        
-        // Activate Member
-        function activateMember(memberId) {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            const member = currentData.appData.members.find(m => m.id === memberId);
-            if (!member) return;
-            
-            member.status = 'active';
-            displayMembersData(currentData.appData.members);
-            showNotification(`Member "${member.name}" has been activated`);
-        }
-        
-        // Deactivate Member
-        function deactivateMember(memberId) {
-            const member = currentData.appData.members.find(m => m.id === memberId);
-            if (!member) return;
-            
-            member.status = 'inactive';
-            displayMembersData(currentData.appData.members);
-            showNotification(`Member "${member.name}" has been deactivated`);
-        }
-        
-        // Ban Member
-        function banMember(memberId) {
-            const member = currentData.appData.members.find(m => m.id === memberId);
-            if (!member) return;
-            
-            member.status = 'banned';
-            displayMembersData(currentData.appData.members);
-            showNotification(`Member "${member.name}" has been banned`);
-        }
-        
-        // Display Approvals Data
-        function displayApprovalsData(approvals, filter = 'all') {
-            approvalsList.innerHTML = '';
-            
-            let filteredApprovals = approvals;
-            
-            if (filter === 'approved') {
-                filteredApprovals = approvals.filter(a => a.processed && a.approved);
-            } else if (filter === 'pending') {
-                filteredApprovals = approvals.filter(a => !a.processed);
-            } else if (filter === 'rejected') {
-                filteredApprovals = approvals.filter(a => a.processed && !a.approved);
-            }
-            
-            if (filteredApprovals.length === 0) {
-                approvalsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-check-circle"></i>
-                        <div>No ${filter !== 'all' ? filter + ' ' : ''}approval codes found</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            const sortedApprovals = [...filteredApprovals].sort((a, b) => b.time - a.time);
-            
-            sortedApprovals.forEach(approval => {
-                const item = document.createElement('div');
-                item.className = 'approval-item';
-                
-                const statusClass = approval.processed ? 
-                    (approval.approved ? 'status-active' : 'status-inactive') : 'status-pending';
-                
-                const statusText = approval.processed ? 
-                    (approval.approved ? 'Approved' : 'Rejected') : 'Pending';
-                
-                const amountClass = getApprovalAmountClass(approval.amount);
-                const badgeClass = approval.amount <= 500 ? 'badge-common' : 
-                                 approval.amount <= 5000 ? 'badge-rare' : 'badge-very-rare';
-                const badgeText = approval.amount <= 500 ? 'Common' : 
-                                approval.amount <= 5000 ? 'Rare' : 'Very Rare';
-                
-                item.innerHTML = `
-                    <div class="approval-info">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                            <div class="approval-amount ${amountClass}">${approval.amount.toLocaleString()} credit</div>
-                            <span class="approval-badge ${badgeClass}">${badgeText}</span>
-                            <span class="status-badge ${statusClass}">
-                                ${approval.processed ? (approval.approved ? '✓' : '✗') : '⏳'}
-                                ${statusText}
-                            </span>
-                        </div>
-                        <div class="approval-time">
-                            <i class="far fa-clock"></i>
-                            ${new Date(approval.time).toLocaleString()}
-                            ${approval.id ? ` • ID: ${approval.id.substring(0, 8)}` : ''}
-                        </div>
-                    </div>
-                `;
-                
-                approvalsList.appendChild(item);
-            });
-        }
-        
-        // Get Balance Status Class
-        function getBalanceStatus(balance) {
-            if (balance >= 10000) return 'balance-high';
-            if (balance >= 5000) return 'balance-medium';
-            return 'balance-low';
-        }
-        
-        // Get Approval Amount Class
-        function getApprovalAmountClass(amount) {
-            if (amount <= 500) return 'balance-high';
-            if (amount <= 5000) return 'balance-medium';
-            return 'balance-low';
-        }
-        
-        // Export Members Data
-        exportMembersBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            if (!currentData || !currentData.appData.members.length) {
-                showNotification('No members data to export');
-                return;
-            }
-            
-            const membersData = {
-                exportedMembers: currentData.appData.members,
-                exportDate: new Date().toISOString(),
-                sourceUser: currentData.userInfo.id
-            };
-            
-            downloadJSON(membersData, `${currentData.userInfo.id}_members_export.json`);
-        });
-        
-        // Export Approvals Data
-        exportApprovalsBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            if (!currentData || !currentData.appData.approvals.length) {
-                showNotification('No approvals data to export');
-                return;
-            }
-            
-            const approvalsData = {
-                exportedApprovals: currentData.appData.approvals,
-                exportDate: new Date().toISOString(),
-                sourceUser: currentData.userInfo.id
-            };
-            
-            downloadJSON(approvalsData, `${currentData.userInfo.id}_approvals_export.json`);
-        });
-        
-        // Clear All Members
-        clearMembersBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            if (!currentData) return;
-            
-            if (confirm('Are you sure you want to clear ALL members data? This action cannot be undone.')) {
-                currentData.appData.members = [];
-                displayMembersData([]);
-                displayMemberCount.textContent = '0';
-                showNotification('All members data has been cleared');
-            }
-        });
-        
-        // Activate All Members
-        activateAllBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            if (!currentData) return;
-            
-            if (confirm('Are you sure you want to activate ALL members?')) {
-                currentData.appData.members.forEach(member => {
-                    member.status = 'active';
+            const namePart = key.substring(0, 4);
+            const sarPart = key.substring(4, 6);
+
+            try {
+                await fetchAllUsers();
+                const user = allUsersCache.find(u => {
+                    const uName = (u.fullName || '').toLowerCase().substring(0, 4);
+                    const uSar = (u.sarNo || '').slice(-2);
+                    return uName === namePart && uSar === sarPart;
                 });
-                displayMembersData(currentData.appData.members);
-                showNotification('All members have been activated');
-            }
-        });
-        
-        // Clear All Approvals
-        clearApprovalsBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            if (!currentData) return;
-            
-            if (confirm('Are you sure you want to clear ALL approval codes? This action cannot be undone.')) {
-                currentData.appData.approvals = [];
-                displayApprovalsData([]);
-                displayApprovalCount.textContent = '0';
-                showNotification('All approval codes have been cleared');
-            }
-        });
-        
-        // Clear All Data
-        clearAllBtn.addEventListener('click', () => {
-            if (!isVerified) {
-                showNotification('Please verify admin access first');
-                return;
-            }
-            
-            if (confirm('Are you sure you want to clear ALL loaded data? This will reset the display.')) {
-                currentData = null;
-                dataDisplay.classList.add('hidden');
-                jsonFileInput.value = '';
-                fileInfo.textContent = 'All data cleared';
-                fileInfo.style.color = 'var(--google-red)';
-                showNotification('All data cleared successfully');
-            }
-        });
-        
-        // Approval Filters
-        showApprovedOnlyBtn.addEventListener('click', () => {
-            if (currentData) {
-                displayApprovalsData(currentData.appData.approvals, 'approved');
-            }
-        });
-        
-        showPendingOnlyBtn.addEventListener('click', () => {
-            if (currentData) {
-                displayApprovalsData(currentData.appData.approvals, 'pending');
-            }
-        });
-        
-        showAllApprovalsBtn.addEventListener('click', () => {
-            if (currentData) {
-                displayApprovalsData(currentData.appData.approvals, 'all');
-            }
-        });
-        
-        // Action Modal Event Listeners
-        deactivateBtn.addEventListener('click', () => {
-            deactivateMember(currentMemberId);
-            actionModal.style.display = 'none';
-        });
-        
-        banBtn.addEventListener('click', () => {
-            banMember(currentMemberId);
-            actionModal.style.display = 'none';
-        });
-        
-        cancelActionBtn.addEventListener('click', () => {
-            actionModal.style.display = 'none';
-        });
-        
-        // Utility Functions
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function downloadJSON(data, filename) {
-            const dataStr = JSON.stringify(data, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            
-            URL.revokeObjectURL(url);
-            showNotification('Data exported successfully!');
-        }
-        
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification notification-info';
-            notification.innerHTML = `
-                <i class="fas fa-bell"></i>
-                <div>${message}</div>
-            `;
-            
-            document.getElementById('notificationContainer').appendChild(notification);
-            
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
+
+                if(user) {
+                    closeModal('modal-direct-signin');
+                    initUserSession(user);
+                } else {
+                    alert("No matching user found for this Direct Key");
                 }
-            }, 3000);
+            } catch(e) {
+                console.error(e);
+                alert("An error occurred during sign in.");
+            }
+            
+            btn.classList.remove('loading');
         }
-        
-        // Initialize
-        console.log('Google Playcode Data Manager loaded');
-        // Tab switching is now initialized properly
+
+        function initUserSession(userData) {
+            currentUser = userData;
+            document.getElementById('page-auth').style.display = 'none';
+            document.getElementById('page-dashboard').style.display = 'block';
+            document.getElementById('navAvatar').innerText = currentUser.fullName.charAt(0).toUpperCase();
+            loadUserRewards();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById('page-auth').style.display = 'block';
+            document.getElementById('inpAccNo').value = '';
+            document.getElementById('inpSarNo').value = '';
+            document.getElementById('inpDirectKey').value = '';
+        }
+
+        function loadUserRewards() {
+            const grid = document.getElementById('userRewardsGrid');
+            grid.innerHTML = '<div style="color:var(--md-sys-color-outline);">Syncing rewards...</div>';
+            
+            db.ref('rewards_data').orderByChild('assignedTo').equalTo(currentUser.accNo).on('value', (snapshot) => {
+                grid.innerHTML = '';
+                if(!snapshot.exists()) {
+                    grid.innerHTML = '<div class="info-box" style="grid-column: 1/-1;">No active rewards found on your account.</div>';
+                    return;
+                }
+                
+                snapshot.forEach(child => {
+                    const r = child.val();
+                    if(r.status === 'Active') {
+                        grid.innerHTML += `
+                            <div class="reward-card">
+                                <div class="rc-header">
+                                    <div class="rc-icon"><span class="material-icons-round">card_giftcard</span></div>
+                                    <div class="rc-status active">Available</div>
+                                </div>
+                                <h3 class="rc-title">${r.title}</h3>
+                                <div class="rc-meta"><span class="material-icons-round" style="font-size:16px;">timer</span> Expires: ${r.expiresDate}</div>
+                                <div class="rc-actions">
+                                    <button class="btn btn-primary" onclick="startActivation('${child.key}')">Activate</button>
+                                    <button class="btn btn-secondary" onclick="openTransferModal('${child.key}')">Transfer</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            });
+        }
+
+        function generateRandomNonZero(length) {
+            let result = '';
+            for(let i = 0; i < length; i++) {
+                result += Math.floor(Math.random() * 9) + 1; 
+            }
+            return result;
+        }
+
+        function startActivation(rewardId) {
+            const overlay = document.getElementById('activationOverlay');
+            const nodeR = document.getElementById('nodeR');
+            
+            // CLEAN RESET - No inline style conflicts
+            overlay.className = 'activation-overlay'; 
+            document.getElementById('tickTitle').innerText = 'Reward Activated';
+            document.getElementById('crtBoxContainer').style.display = 'flex';
+            document.getElementById('generatedCrtCode').innerText = "GENERATING...";
+            
+            nodeR.innerText = currentUser.fullName.charAt(0).toUpperCase();
+            overlay.style.display = 'flex';
+
+            // Animation sequence start
+            setTimeout(() => { overlay.classList.add('seq-1'); }, 100);
+            setTimeout(() => { overlay.classList.add('seq-2'); }, 500); 
+            setTimeout(() => { overlay.classList.add('seq-3'); }, 1000); 
+            
+            // Wait Exactly 3 seconds
+            setTimeout(() => {
+                const part1 = generateRandomNonZero(5);
+                const part2 = generateRandomNonZero(2);
+                const finalCode = `CRT-${part1}-PLAYCODE-23${part2}`;
+                
+                document.getElementById('generatedCrtCode').innerText = finalCode;
+                
+                // Pure CSS handles hiding the green line and showing the tick via .seq-4
+                overlay.classList.add('seq-4'); 
+
+                db.ref(`rewards_data/${rewardId}`).update({ 
+                    status: 'Claimed', 
+                    claimedAt: new Date().toISOString(),
+                    generatedCode: finalCode,
+                    claimedByName: currentUser.fullName,
+                    claimedByAccNo: currentUser.accNo
+                }).catch(err => console.warn("Sync delay:", err));
+                
+            }, 3000); 
+        }
+
+        async function openTransferModal(rewardId) {
+            rewardToTransferId = rewardId;
+            document.getElementById('inpUserSearch').value = '';
+            await fetchAllUsers();
+            filterTransferUsers();
+            openModal('modal-transfer');
+        }
+
+        function filterTransferUsers() {
+            const q = document.getElementById('inpUserSearch').value.toLowerCase();
+            const list = document.getElementById('transferUserList');
+            list.innerHTML = '';
+            
+            const filtered = allUsersCache.filter(u => u.accNo !== currentUser.accNo && (u.fullName.toLowerCase().includes(q) || u.accNo.includes(q)));
+            
+            if(filtered.length === 0) list.innerHTML = '<div style="padding:16px; color:var(--md-sys-color-outline);">No users found</div>';
+            
+            filtered.forEach(u => {
+                list.innerHTML += `
+                    <div class="user-list-item" onclick="executeTransfer('${u.accNo}', '${u.fullName}')">
+                        <div class="uli-avatar">${u.fullName.charAt(0).toUpperCase()}</div>
+                        <div class="uli-details">
+                            <div class="uli-name">${u.fullName}</div>
+                            <div class="uli-acc">${u.accNo}</div>
+                        </div>
+                        <span class="material-icons-round text-primary">send</span>
+                    </div>
+                `;
+            });
+        }
+
+        function executeTransfer(targetAccNo, targetName) {
+            closeModal('modal-transfer');
+            
+            const overlay = document.getElementById('activationOverlay');
+            const nodeL = document.getElementById('nodeL');
+            const nodeR = document.getElementById('nodeR');
+            
+            // CLEAN RESET
+            overlay.className = 'activation-overlay';
+            document.getElementById('tickTitle').innerText = 'Transfer Successful';
+            document.getElementById('crtBoxContainer').style.display = 'none';
+
+            // Swap avatars
+            nodeL.innerHTML = targetName.charAt(0).toUpperCase();
+            nodeL.className = 'anim-node node-user';
+            nodeR.innerHTML = currentUser.fullName.charAt(0).toUpperCase();
+            
+            overlay.style.display = 'flex';
+            
+            // Animation reverse direction
+            setTimeout(() => { overlay.classList.add('seq-3'); }, 100); 
+            setTimeout(() => { overlay.classList.add('seq-2-rev'); }, 500); 
+            setTimeout(() => { overlay.classList.add('seq-1'); }, 1000);
+            
+            // Exactly 3 sec delay
+            setTimeout(() => {
+                overlay.classList.add('seq-4'); // Triggers Blue Tick via pure CSS
+                
+                db.ref(`rewards_data/${rewardToTransferId}`).update({ assignedTo: targetAccNo })
+                  .catch(err => console.warn("Sync delay:", err));
+            }, 3000); 
+        }
+
+        function closeActivationSequence() {
+            const overlay = document.getElementById('activationOverlay');
+            overlay.style.display = 'none';
+            overlay.className = 'activation-overlay'; 
+            
+            // Restore playcode logo
+            const nodeL = document.getElementById('nodeL');
+            nodeL.className = 'anim-node node-playcode';
+            nodeL.innerHTML = '<div class="gp-logo" style="width: 48px; height: 48px;"><div class="gp-triangle"></div></div>';
+        }
+
+        function verifyAdminEmail() {
+            if(document.getElementById('inpAdminEmail').value === 'Samarth6215@Playcode.com') {
+                closeModal('modal-admin-auth');
+                openModal('modal-admin-pin');
+            } else { alert("Unauthorized Email ID"); }
+        }
+
+        function verifyAdminPin() {
+            if(document.getElementById('inpAdminPin').value === '1583') {
+                closeModal('modal-admin-pin');
+                document.getElementById('page-auth').style.display = 'none';
+                document.getElementById('page-admin').style.display = 'block';
+                loadAdminData();
+            } else { alert("Invalid Security PIN"); }
+        }
+
+        async function loadAdminData() {
+            await fetchAllUsers();
+            
+            const sel = document.getElementById('selIssueUser');
+            sel.innerHTML = '<option value="" disabled selected>Select a User</option>';
+            allUsersCache.forEach(u => {
+                sel.innerHTML += `<option value="${u.accNo}">${u.fullName} (${u.accNo})</option>`;
+            });
+
+            db.ref('rewards_data').on('value', snap => {
+                const tbody = document.getElementById('adminRewardsTable');
+                tbody.innerHTML = '';
+                if(snap.exists()) {
+                    snap.forEach(child => {
+                        const r = child.val();
+                        const userName = allUsersCache.find(u => u.accNo === r.assignedTo)?.fullName || r.assignedTo;
+                        const statusColor = r.status === 'Active' ? 'text-success' : 'text-outline';
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-weight: 600; color: white;">${r.title}</td>
+                                <td>${userName}</td>
+                                <td>${r.expiresDate}</td>
+                                <td class="${statusColor}" style="font-weight:600;">${r.status}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            });
+        }
+
+        function openIssueRewardModal() {
+            document.getElementById('inpIssueTitle').value = '';
+            document.getElementById('inpIssueDate').value = '';
+            openModal('modal-issue');
+        }
+
+        function submitNewReward() {
+            const uid = document.getElementById('selIssueUser').value;
+            const title = document.getElementById('inpIssueTitle').value.trim();
+            const date = document.getElementById('inpIssueDate').value;
+
+            if(!uid || !title || !date) return alert("Please fill all fields");
+
+            const newRewardRef = db.ref('rewards_data').push();
+            newRewardRef.set({
+                id: newRewardRef.key,
+                assignedTo: uid,
+                title: title,
+                expiresDate: date,
+                status: 'Active',
+                issuedAt: new Date().toISOString()
+            }).then(() => {
+                closeModal('modal-issue');
+            });
+        }
+
+        function openModal(id) { const el = document.getElementById(id); el.style.display = 'flex'; setTimeout(() => el.classList.add('show'), 10); }
+        function closeModal(id) { const el = document.getElementById(id); el.classList.remove('show'); setTimeout(() => el.style.display = 'none', 300); }
     </script>
 </body>
 </html>
