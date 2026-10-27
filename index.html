@@ -479,27 +479,29 @@ async function signInWithGoogle() {
 async function routeSignedInUser(authUser) {
   if (!authUser) return;
   currentAuthUser = authUser;
-  const email = (authUser.email || '').toLowerCase();
+  const email = String(authUser.email || '').trim().toLowerCase();
 
-  // Admin roles live at /user/<numeric-user-id>/role.
-  // Match the signed-in Google account to a database record before trusting its role.
+  // Admin authorization: /user/<numeric-id>/role === "admin".
+  // Only trust a numeric record that matches the authenticated Google UID or email.
   const roleSnapshot = await db.ref('user').once('value');
-  let matchedRoleRecord = null;
-  let matchedRoleId = null;
+  let adminRecord = null;
   if (roleSnapshot.exists()) {
     roleSnapshot.forEach(child => {
+      if (!/^\\d+$/.test(String(child.key))) return;
       const record = child.val() || {};
-      const recordEmail = String(record.email || record.emailAddress || record.googleEmail || '').toLowerCase();
-      const recordUid = String(record.uid || record.authUid || '');
-      const numericId = /^\\d+$/.test(child.key);
-      if (numericId && ((email && recordEmail === email) || recordUid === authUser.uid)) {
-        matchedRoleRecord = record;
-        matchedRoleId = child.key;
+      const recordEmail = String(record.email || record.emailAddress || record.googleEmail || '').trim().toLowerCase();
+      const recordUid = String(record.uid || record.authUid || record.googleUid || '');
+      const matchesAuthenticatedAccount =
+        (recordUid && recordUid === authUser.uid) ||
+        (email && recordEmail && recordEmail === email);
+      if (matchesAuthenticatedAccount && String(record.role || '').toLowerCase() === 'admin') {
+        adminRecord = { ...record, id: child.key };
       }
     });
   }
 
-  if (matchedRoleRecord && matchedRoleRecord.role === 'admin') {
+  if (adminRecord) {
+    currentUser = null;
     document.getElementById('page-auth').style.display = 'none';
     document.getElementById('page-dashboard').style.display = 'none';
     document.getElementById('page-admin').style.display = 'block';
@@ -507,24 +509,39 @@ async function routeSignedInUser(authUser) {
     return;
   }
 
-  // Regular users are matched to their existing /users records by Google email.
+  // Regular PlayCode accounts use the supplied backend's /users schema and googleUid link.
   await fetchAllUsers();
-  let userData = allUsersCache.find(u =>
-    String(u.email || u.emailAddress || '').toLowerCase() === email ||
-    String(u.uid || u.authUid || '') === authUser.uid
-  );
-  if (!userData) {
-    userData = {
-      accNo: authUser.uid,
-      fullName: authUser.displayName || (email ? email.split('@')[0] : 'User'),
-      email: authUser.email || '',
-      photoURL: authUser.photoURL || ''
-    };
-  } else {
-    userData = { ...userData, accNo: userData.accNo || authUser.uid };
+  let userData = allUsersCache.find(u => String(u.googleUid || '') === authUser.uid);
+  if (!userData && email) {
+    userData = allUsersCache.find(u =>
+      String(u.googleEmail || u.email || u.emailAddress || '').trim().toLowerCase() === email
+    );
   }
+
+  if (!userData) {
+    await auth.signOut();
+    alert('This Google account is not linked to a PlayCode account. Please link it to an existing account first.');
+    document.getElementById('page-auth').style.display = 'block';
+    document.getElementById('page-dashboard').style.display = 'none';
+    document.getElementById('page-admin').style.display = 'none';
+    return;
+  }
+
+  userData = { ...userData, accNo: String(userData.accNo || userData.accountNo || '') };
+  if (!userData.accNo) {
+    await auth.signOut();
+    alert('Your PlayCode account record is missing its account number. Please contact support.');
+    return;
+  }
+
+  currentUser = userData;
+  db.ref('users/' + currentUser.accNo).update({
+    lastLogin: new Date().toISOString()
+  }).catch(err => console.warn('Could not update lastLogin:', err));
+
   initUserSession(userData);
 }
+
 
 auth.onAuthStateChanged(async user => {
   if (!user) return;
